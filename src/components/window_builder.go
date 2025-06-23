@@ -49,7 +49,7 @@ func (wb *WindowBuilder) onOpenFolderButtonClicked() {
 			return
 		}
 		wb.ib.UpdatePath(lu.Path())
-		wb.setContent(false)
+		wb.setContent()
 
 	}, wb.window)
 
