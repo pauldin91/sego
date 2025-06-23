@@ -15,13 +15,9 @@ var (
 func main() {
 	a := app.NewWithID("image.viewer." + time.Now().String())
 
-	ctxImage := components.NewImageContainer(wWidth, wHeight)
-
-	wb := components.NewWindowBuilder("Hakuna Matata", a)
-
-	w := wb.
+	w := components.NewWindowBuilder("Hakuna Matata", a).
 		OfSize(wWidth, wHeight).
-		WithDefaultLayout(ctxImage).
+		WithCanvasOfSize(wWidth, wHeight).
 		Build()
 
 	w.ShowAndRun()

@@ -13,8 +13,8 @@ type WindowBuilder struct {
 	contents []fyne.CanvasObject
 }
 
-func NewWindowBuilder(title string, a fyne.App) WindowBuilder {
-	return WindowBuilder{
+func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
+	return &WindowBuilder{
 		w:        a.NewWindow(title),
 		contents: make([]fyne.CanvasObject, 0),
 	}
@@ -30,7 +30,8 @@ func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
 	return wb
 }
 
-func (wb *WindowBuilder) WithDefaultLayout(ctxImage ImageContainer) *WindowBuilder {
+func (wb *WindowBuilder) WithCanvasOfSize(wWidth, wHeight float32) *WindowBuilder {
+	ctxImage := NewImageContainer(wWidth, wHeight)
 	openFileDialog := widget.NewButton("Open Image", func() { wb.tapped(ctxImage) })
 	wb.AddContent(openFileDialog)
 	wb.AddContent(ctxImage.content)
