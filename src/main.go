@@ -17,7 +17,7 @@ func main() {
 
 	w := components.NewWindowBuilder("Hakuna Matata", a).
 		OfSize(wWidth, wHeight).
-		WithCanvasOfSize(wWidth, wHeight).
+		WithOpenFileButton().
 		Build()
 
 	w.ShowAndRun()

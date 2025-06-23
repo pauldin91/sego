@@ -30,15 +30,16 @@ func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
 	return wb
 }
 
-func (wb *WindowBuilder) WithCanvasOfSize(wWidth, wHeight float32) *WindowBuilder {
-	ctxImage := NewImageContainer(wWidth, wHeight)
-	openFileDialog := widget.NewButton("Open Image", func() { wb.tapped(ctxImage) })
-	wb.AddContent(openFileDialog)
+func (wb *WindowBuilder) WithOpenFileButton() *WindowBuilder {
+	size := wb.w.Canvas().Size()
+	ctxImage := NewImageContainer(size.Width-20, size.Height-10)
+	openFileButton := widget.NewButton("Open Image", func() { wb.onOpenFileButtonClicked(ctxImage) })
+	wb.AddContent(openFileButton)
 	wb.AddContent(ctxImage.content)
 	return wb
 }
 
-func (wb *WindowBuilder) tapped(ctxImage ImageContainer) {
+func (wb *WindowBuilder) onOpenFileButtonClicked(ctxImage ImageContainer) {
 	fd := dialog.NewFileOpen(ctxImage.UpdateContent, wb.w)
 	fd.SetFilter(storage.NewExtensionFileFilter([]string{".png", ".jpg", ".jpeg"}))
 	fd.Show()
