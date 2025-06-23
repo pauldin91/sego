@@ -15,9 +15,10 @@ var (
 func main() {
 	a := app.NewWithID("image.viewer." + time.Now().String())
 
-	w := components.NewWindowBuilder("Hakuna Matata", a).
-		OfSize(wWidth, wHeight).
-		WithOpenFileButton().
+	w := components.
+		NewWindowBuilder("Hakuna Matata", a).
+		WithSize(wWidth, wHeight).
+		WithOpenFolderButton().
 		Build()
 
 	w.ShowAndRun()

@@ -1,7 +1,10 @@
 package components
 
 import (
+	"os"
+
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
@@ -9,19 +12,23 @@ import (
 )
 
 type WindowBuilder struct {
-	w        fyne.Window
+	window   fyne.Window
+	ib       ImageBrowser
 	contents []fyne.CanvasObject
 }
 
 func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
+	initPath, _ := os.Getwd()
+
 	return &WindowBuilder{
-		w:        a.NewWindow(title),
+		window:   a.NewWindow(title),
 		contents: make([]fyne.CanvasObject, 0),
+		ib:       NewImageBrowser(initPath),
 	}
 }
 
-func (wb *WindowBuilder) OfSize(width, height float32) *WindowBuilder {
-	wb.w.Resize(fyne.NewSize(width, height))
+func (wb *WindowBuilder) WithSize(width, height float32) *WindowBuilder {
+	wb.window.Resize(fyne.NewSize(width, height))
 	return wb
 }
 
@@ -30,26 +37,51 @@ func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
 	return wb
 }
 
-func (wb *WindowBuilder) WithOpenFileButton() *WindowBuilder {
-	size := wb.w.Canvas().Size()
-	ctxImage := NewImageContainer(size.Width-20, size.Height-10)
-	openFileButton := widget.NewButton("Open Image", func() { wb.onOpenFileButtonClicked(ctxImage) })
-	wb.AddContent(openFileButton)
-	wb.AddContent(ctxImage.content)
+func (wb *WindowBuilder) WithOpenFolderButton() *WindowBuilder {
+	openFolderButton := widget.NewButton("Open Folder", func() { wb.onOpenFolderButtonClicked() })
+	wb.AddContent(openFolderButton)
 	return wb
 }
 
-func (wb *WindowBuilder) onOpenFileButtonClicked(ctxImage ImageContainer) {
-	fd := dialog.NewFileOpen(ctxImage.UpdateContent, wb.w)
-	fd.SetFilter(storage.NewExtensionFileFilter([]string{".png", ".jpg", ".jpeg"}))
+func (wb *WindowBuilder) onOpenFolderButtonClicked() {
+	fd := dialog.NewFolderOpen(func(lu fyne.ListableURI, err error) {
+		if err != nil || lu == nil {
+			return
+		}
+		wb.ib.UpdatePath(lu.Path())
+		wb.setContent(false)
+
+	}, wb.window)
+
+	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
+	if err == nil {
+		fd.SetLocation(uri)
+	}
 	fd.Show()
 }
 
-func (wb *WindowBuilder) Build() fyne.Window {
+func (wb *WindowBuilder) setContent(init bool) {
 	containers := container.NewHBox()
 	for _, obj := range wb.contents {
 		containers.Add(obj)
 	}
-	wb.w.SetContent(containers)
-	return wb.w
+
+	if wb.ib.DirCount() > 0 {
+		var img *canvas.Image
+		if init {
+			img = wb.ib.GetCurrent()
+		} else {
+			img = wb.ib.GetNext()
+		}
+		img.SetMinSize(fyne.NewSize(wb.window.Canvas().Size().Width, wb.window.Canvas().Size().Height))
+		containers.Add(img)
+	}
+
+	wb.window.SetContent(containers)
+	wb.window.Content().Refresh()
+}
+
+func (wb *WindowBuilder) Build() fyne.Window {
+	wb.setContent(true)
+	return wb.window
 }
