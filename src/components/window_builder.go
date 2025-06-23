@@ -60,19 +60,14 @@ func (wb *WindowBuilder) onOpenFolderButtonClicked() {
 	fd.Show()
 }
 
-func (wb *WindowBuilder) setContent(init bool) {
+func (wb *WindowBuilder) setContent() {
 	containers := container.NewHBox()
 	for _, obj := range wb.contents {
 		containers.Add(obj)
 	}
 
 	if wb.ib.DirCount() > 0 {
-		var img *canvas.Image
-		if init {
-			img = wb.ib.GetCurrent()
-		} else {
-			img = wb.ib.GetNext()
-		}
+		var img *canvas.Image = wb.ib.GetCurrent()
 		img.SetMinSize(fyne.NewSize(wb.window.Canvas().Size().Width, wb.window.Canvas().Size().Height))
 		containers.Add(img)
 	}
@@ -82,6 +77,6 @@ func (wb *WindowBuilder) setContent(init bool) {
 }
 
 func (wb *WindowBuilder) Build() fyne.Window {
-	wb.setContent(true)
+	wb.setContent()
 	return wb.window
 }
