@@ -14,22 +14,27 @@ import (
 
 type WindowBuilder struct {
 	window   fyne.Window
-	ib       ImageBrowser
+	ib       *ImageBrowser
 	contents []fyne.CanvasObject
+	size     fyne.Size
+	canvas   *DrawCanvas
 }
 
 func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
 	initPath, _ := os.Getwd()
 
-	return &WindowBuilder{
+	result := &WindowBuilder{
 		window:   a.NewWindow(title),
 		contents: make([]fyne.CanvasObject, 0),
 		ib:       NewImageBrowser(initPath),
 	}
+
+	return result
 }
 
 func (wb *WindowBuilder) WithSize(width, height float32) *WindowBuilder {
-	wb.window.Resize(fyne.NewSize(width, height))
+	wb.size = fyne.NewSize(width, height)
+	wb.window.Resize(wb.size)
 	return wb
 }
 
@@ -68,11 +73,13 @@ func (wb *WindowBuilder) setContent() {
 	}
 
 	if wb.ib.DirCount() > 0 {
+		wb.canvas = NewDrawCanvas(wb.size)
 		var img *canvas.Image = wb.ib.GetCurrent()
-		img.SetMinSize(fyne.NewSize(640, 480))
-		containers.Add(img)
+		img.SetMinSize(wb.size)
+		containers.Add(container.NewStack(img, wb.canvas))
 		wb.window.Canvas().SetOnTypedKey(wb.KeyPressedEvent)
-		wb.window.Resize(fyne.NewSize(640, 480))
+		wb.window.Resize(wb.size)
+
 	}
 
 	wb.window.SetContent(containers)

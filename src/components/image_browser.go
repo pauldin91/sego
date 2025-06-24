@@ -24,8 +24,9 @@ type ImageBrowser struct {
 	files []string
 }
 
-func NewImageBrowser(path string) ImageBrowser {
-	var res = ImageBrowser{
+func NewImageBrowser(path string) *ImageBrowser {
+
+	var res = &ImageBrowser{
 		path:  path,
 		index: 0,
 	}
@@ -64,7 +65,8 @@ func (ib *ImageBrowser) listDir() []string {
 
 func isImageFile(file string) bool {
 	ext := strings.ToLower(filepath.Ext(file))
-	return imageExts[ext]
+	_, ok := imageExts[ext]
+	return ok
 }
 
 func (ib *ImageBrowser) GetCurrent() *canvas.Image {
