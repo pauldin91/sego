@@ -1,11 +1,15 @@
 package components
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/widget"
+	"github.com/pauldin91/sego/src/common"
 )
 
 var imageExts = map[string]bool{
@@ -19,27 +23,79 @@ var imageExts = map[string]bool{
 }
 
 type ImageBrowser struct {
-	path  string
-	index int
-	files []string
+	widget.BaseWidget
+
+	path    string
+	index   int
+	files   []string
+	currImg *canvas.Image
+	size    fyne.Size
 }
 
-func NewImageBrowser(path string) *ImageBrowser {
-
-	var res = &ImageBrowser{
+func NewImageBrowser(size fyne.Size, path string) *ImageBrowser {
+	ib := &ImageBrowser{
 		path:  path,
 		index: 0,
+		size:  size,
 	}
-	res.files = res.listDir()
-	return res
+	ib.files = ib.listDir()
+	ib.currImg, _ = common.DefaultBlankImage(size)
+	ib.ExtendBaseWidget(ib)
+	ib.loadCurrentImage()
+	return ib
 }
 
-func (ib *ImageBrowser) Next() {
-	ib.index++
+func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
+	return widget.NewSimpleRenderer(ib.currImg)
 }
 
-func (ib *ImageBrowser) Previous() {
-	ib.index--
+func (ib *ImageBrowser) listDir() []string {
+	entries, err := os.ReadDir(ib.path)
+	if err != nil {
+		fmt.Println("Error reading directory:", err)
+		return nil
+	}
+	paths := []string{}
+	for _, entry := range entries {
+		if entry.Type().IsRegular() && isImage(entry.Name()) {
+			paths = append(paths, filepath.Join(ib.path, entry.Name()))
+		}
+	}
+	return paths
+}
+
+func isImage(file string) bool {
+	ext := strings.ToLower(filepath.Ext(file))
+	return imageExts[ext]
+}
+
+func (ib *ImageBrowser) loadCurrentImage() {
+	if len(ib.files) == 0 {
+		return
+	}
+	imgPath := ib.files[ib.index]
+	ib.currImg.File = imgPath
+	ib.currImg.Refresh()
+}
+
+func (ib *ImageBrowser) Refresh() {
+	ib.loadCurrentImage()
+}
+
+func (ib *ImageBrowser) getNext() {
+	if len(ib.files) == 0 {
+		return
+	}
+	ib.index = (ib.index + 1) % len(ib.files)
+	ib.Refresh()
+}
+
+func (ib *ImageBrowser) getPrevious() {
+	if len(ib.files) == 0 {
+		return
+	}
+	ib.index = (ib.index - 1 + len(ib.files)) % len(ib.files)
+	ib.Refresh()
 }
 
 func (ib *ImageBrowser) DirCount() int {
@@ -50,40 +106,21 @@ func (ib *ImageBrowser) UpdatePath(path string) {
 	ib.path = path
 	ib.index = 0
 	ib.files = ib.listDir()
+	ib.Refresh()
 }
 
-func (ib *ImageBrowser) listDir() []string {
-	imgSrc, _ := os.ReadDir(ib.path)
-	paths := make([]string, 0)
-	for _, entry := range imgSrc {
-		if entry.Type().IsRegular() && isImageFile(entry.Name()) {
-			paths = append(paths, filepath.Join(ib.path, entry.Name()))
-		}
+func (ib *ImageBrowser) FocusLost()       {}
+func (ib *ImageBrowser) FocusGained()     {}
+func (ib *ImageBrowser) TypedRune(r rune) {}
+func (ib *ImageBrowser) Focused() bool    { return true }
+
+func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
+	fmt.Printf("Key pressed: %s (%v)\n", event.Name, event.Physical)
+
+	switch event.Name {
+	case fyne.KeyLeft:
+		ib.getPrevious()
+	case fyne.KeyRight:
+		ib.getNext()
 	}
-	return paths
-}
-
-func isImageFile(file string) bool {
-	ext := strings.ToLower(filepath.Ext(file))
-	_, ok := imageExts[ext]
-	return ok
-}
-
-func (ib *ImageBrowser) GetCurrent() *canvas.Image {
-	if 0 > ib.index {
-		ib.index = len(ib.files) - 1
-	}
-	if len(ib.files) <= ib.index {
-		ib.index = 0
-	}
-	var imgSrc = ib.files[ib.index]
-	var img = canvas.NewImageFromFile(imgSrc)
-	img.FillMode = canvas.ImageFillContain
-
-	return img
-}
-
-func (ib *ImageBrowser) GetNext() *canvas.Image {
-	ib.index++
-	return ib.GetCurrent()
 }

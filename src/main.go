@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"github.com/pauldin91/sego/src/components"
 )
@@ -16,8 +17,7 @@ func main() {
 	a := app.NewWithID("image.viewer." + time.Now().String())
 
 	w := components.
-		NewWindowBuilder("Hakuna Matata", a).
-		WithSize(wWidth, wHeight).
+		NewWindowBuilder(fyne.NewSize(wWidth, wHeight), "Hakuna Matata", a).
 		WithOpenFolderButton().
 		Build()
 

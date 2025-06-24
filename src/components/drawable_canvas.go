@@ -3,12 +3,13 @@ package components
 import (
 	"image"
 	"image/color"
-	"image/draw"
+	"math"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
+	"github.com/pauldin91/sego/src/common"
 )
 
 type DrawCanvas struct {
@@ -19,16 +20,14 @@ type DrawCanvas struct {
 }
 
 func NewDrawCanvas(size fyne.Size) *DrawCanvas {
-	dc := &DrawCanvas{
-		rgba: image.NewRGBA(image.Rect(0, 0, int(size.Width), int(size.Height))),
-	}
-	draw.Draw(dc.rgba, dc.rgba.Bounds(), &image.Uniform{color.Transparent}, image.Point{}, draw.Src)
+	drawableCanvas := &DrawCanvas{}
 
-	dc.img = canvas.NewImageFromImage(dc.rgba)
-	dc.img.FillMode = canvas.ImageFillContain
-	dc.img.SetMinSize(size)
-	dc.ExtendBaseWidget(dc)
-	return dc
+	img, rgba := common.DefaultBlankImage(size)
+	drawableCanvas.img = img
+	drawableCanvas.rgba = rgba
+
+	drawableCanvas.ExtendBaseWidget(drawableCanvas)
+	return drawableCanvas
 }
 
 func (d *DrawCanvas) CreateRenderer() fyne.WidgetRenderer {
@@ -39,10 +38,20 @@ func (d *DrawCanvas) Dragged(e *fyne.DragEvent) {
 	if !d.pressed {
 		return
 	}
-	x, y := int(e.Position.X), int(e.Position.Y)
-	d.rgba.Set(x, y, color.White)
+	circle := canvas.NewCircle(color.White)
+	circle.Resize(fyne.NewSize(5, 5))
+	d.drawCircle(e.Position)
 	d.img.Image = d.rgba
 	d.img.Refresh()
+}
+func (d *DrawCanvas) drawCircle(center fyne.Position) {
+	for r := -5.0; r < 5.0; r += 1 {
+		for th := -math.Pi; th < math.Pi; th += math.Pi / 16 {
+			x := r*math.Cos(th) + float64(center.X)
+			y := r*math.Sin(th) + float64(center.Y)
+			d.rgba.Set(int(x), int(y), color.White)
+		}
+	}
 }
 
 func (d *DrawCanvas) DragEnd() {

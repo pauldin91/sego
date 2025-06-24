@@ -1,11 +1,9 @@
 package components
 
 import (
-	"fmt"
 	"os"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
@@ -13,29 +11,25 @@ import (
 )
 
 type WindowBuilder struct {
-	window   fyne.Window
-	ib       *ImageBrowser
-	contents []fyne.CanvasObject
-	size     fyne.Size
-	canvas   *DrawCanvas
+	window     fyne.Window
+	ib         *ImageBrowser
+	contents   []fyne.CanvasObject
+	canvasSize fyne.Size
+	canvas     *DrawCanvas
 }
 
-func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
+func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
 	initPath, _ := os.Getwd()
 
 	result := &WindowBuilder{
-		window:   a.NewWindow(title),
-		contents: make([]fyne.CanvasObject, 0),
-		ib:       NewImageBrowser(initPath),
+		window:     a.NewWindow(title),
+		contents:   make([]fyne.CanvasObject, 0),
+		ib:         NewImageBrowser(size, initPath),
+		canvasSize: size,
 	}
+	result.window.Resize(result.canvasSize)
 
 	return result
-}
-
-func (wb *WindowBuilder) WithSize(width, height float32) *WindowBuilder {
-	wb.size = fyne.NewSize(width, height)
-	wb.window.Resize(wb.size)
-	return wb
 }
 
 func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
@@ -45,6 +39,7 @@ func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
 
 func (wb *WindowBuilder) WithOpenFolderButton() *WindowBuilder {
 	openFolderButton := widget.NewButton("Open Folder", func() { wb.onOpenFolderButtonClicked() })
+	openFolderButton.Resize(fyne.NewSize(60, 30))
 	wb.AddContent(openFolderButton)
 	return wb
 }
@@ -67,44 +62,22 @@ func (wb *WindowBuilder) onOpenFolderButtonClicked() {
 }
 
 func (wb *WindowBuilder) setContent() {
-	containers := container.NewHBox()
+	containers := container.NewVBox()
+	wb.canvas = NewDrawCanvas(wb.canvasSize)
+	containers.Add(container.NewStack(wb.ib, wb.canvas))
+
 	for _, obj := range wb.contents {
 		containers.Add(obj)
 	}
 
-	if wb.ib.DirCount() > 0 {
-		wb.canvas = NewDrawCanvas(wb.size)
-		var img *canvas.Image = wb.ib.GetCurrent()
-		img.SetMinSize(wb.size)
-		containers.Add(container.NewStack(img, wb.canvas))
-		wb.window.Canvas().SetOnTypedKey(wb.KeyPressedEvent)
-		wb.window.Resize(wb.size)
-
-	}
-
 	wb.window.SetContent(containers)
+	wb.window.Canvas().Focus(wb.ib)
+
+	wb.window.Resize(wb.canvasSize)
 	wb.window.Content().Refresh()
 }
 
 func (wb *WindowBuilder) Build() fyne.Window {
 	wb.setContent()
 	return wb.window
-}
-
-func (wb *WindowBuilder) KeyPressedEvent(event *fyne.KeyEvent) {
-
-	fmt.Printf("Event name : %s, Event type : %v\n", event.Name, event.Physical)
-
-	switch event.Name {
-	case fyne.KeyLeft:
-		wb.ib.Previous()
-		wb.setContent()
-		return
-	case fyne.KeyRight:
-		wb.ib.Next()
-		wb.setContent()
-
-	default:
-		return
-	}
 }
