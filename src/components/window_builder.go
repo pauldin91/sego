@@ -15,7 +15,6 @@ type WindowBuilder struct {
 	ib         *ImageBrowser
 	contents   []fyne.CanvasObject
 	canvasSize fyne.Size
-	canvas     *DrawCanvas
 }
 
 func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
@@ -63,8 +62,7 @@ func (wb *WindowBuilder) onOpenFolderButtonClicked() {
 
 func (wb *WindowBuilder) setContent() {
 	containers := container.NewVBox()
-	wb.canvas = NewDrawCanvas(wb.canvasSize)
-	containers.Add(container.NewStack(wb.ib, wb.canvas))
+	containers.Add(wb.ib)
 
 	for _, obj := range wb.contents {
 		containers.Add(obj)

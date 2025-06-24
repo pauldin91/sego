@@ -1,9 +1,13 @@
 package common
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -17,4 +21,24 @@ func DefaultBlankImage(size fyne.Size) (*canvas.Image, *image.RGBA) {
 	currImg.FillMode = canvas.ImageFillContain
 	currImg.SetMinSize(size)
 	return currImg, rgba
+}
+
+func ListDir(dir string) []string {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		fmt.Println("Error reading directory:", err)
+		return nil
+	}
+	paths := []string{}
+	for _, entry := range entries {
+		if entry.Type().IsRegular() && isImage(entry.Name()) {
+			paths = append(paths, filepath.Join(dir, entry.Name()))
+		}
+	}
+	return paths
+}
+
+func isImage(file string) bool {
+	ext := strings.ToLower(filepath.Ext(file))
+	return imageExts[ext]
 }
