@@ -32,6 +32,15 @@ func NewImageBrowser(path string) ImageBrowser {
 	res.files = res.listDir()
 	return res
 }
+
+func (ib *ImageBrowser) Next() {
+	ib.index++
+}
+
+func (ib *ImageBrowser) Previous() {
+	ib.index--
+}
+
 func (ib *ImageBrowser) DirCount() int {
 	return len(ib.files)
 }
@@ -59,7 +68,10 @@ func isImageFile(file string) bool {
 }
 
 func (ib *ImageBrowser) GetCurrent() *canvas.Image {
-	if len(ib.files) >= ib.index {
+	if 0 > ib.index {
+		ib.index = len(ib.files) - 1
+	}
+	if len(ib.files) <= ib.index {
 		ib.index = 0
 	}
 	var imgSrc = ib.files[ib.index]

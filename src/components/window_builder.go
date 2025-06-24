@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"os"
 
 	"fyne.io/fyne/v2"
@@ -68,8 +69,10 @@ func (wb *WindowBuilder) setContent() {
 
 	if wb.ib.DirCount() > 0 {
 		var img *canvas.Image = wb.ib.GetCurrent()
-		img.SetMinSize(fyne.NewSize(wb.window.Canvas().Size().Width, wb.window.Canvas().Size().Height))
+		img.SetMinSize(fyne.NewSize(640, 480))
 		containers.Add(img)
+		wb.window.Canvas().SetOnTypedKey(wb.KeyPressedEvent)
+		wb.window.Resize(fyne.NewSize(640, 480))
 	}
 
 	wb.window.SetContent(containers)
@@ -79,4 +82,22 @@ func (wb *WindowBuilder) setContent() {
 func (wb *WindowBuilder) Build() fyne.Window {
 	wb.setContent()
 	return wb.window
+}
+
+func (wb *WindowBuilder) KeyPressedEvent(event *fyne.KeyEvent) {
+
+	fmt.Printf("Event name : %s, Event type : %v\n", event.Name, event.Physical)
+
+	switch event.Name {
+	case fyne.KeyLeft:
+		wb.ib.Previous()
+		wb.setContent()
+		return
+	case fyne.KeyRight:
+		wb.ib.Next()
+		wb.setContent()
+
+	default:
+		return
+	}
 }
