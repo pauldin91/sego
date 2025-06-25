@@ -2,47 +2,39 @@ package components
 
 import (
 	"fmt"
-	"image"
-	"image/color"
-	"image/png"
-	"math"
 	"os"
 	"path"
 	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 	"github.com/pauldin91/sego/src/common"
 )
 
 type ImageBrowser struct {
 	widget.BaseWidget
-	brushSize float64
-	img       *canvas.Image
-	rgba      *image.RGBA
-	pressed   bool
-	path      string
-	index     int
-	files     []string
-	currImg   *canvas.Image
-	size      fyne.Size
+	path          string
+	index         int
+	files         []string
+	currImg       *canvas.Image
+	size          fyne.Size
+	filenames     chan string
+	saveCompleted chan bool
 }
 
-func NewImageBrowser(size fyne.Size, path string) *ImageBrowser {
+func NewImageBrowser(fileChan chan string, saveCompleted chan bool) *ImageBrowser {
+	initPath, _ := os.Getwd()
+	initPath = path.Join(initPath, "..", "resources")
 	ib := &ImageBrowser{
-		path:      path,
-		index:     0,
-		size:      size,
-		brushSize: common.BrushSize,
+		path:          initPath,
+		index:         0,
+		size:          common.Size,
+		filenames:     fileChan,
+		saveCompleted: saveCompleted,
 	}
-	ib.files = common.ListDir(ib.path)
-	ib.img, ib.rgba = common.DefaultBlankImage(size)
-	ib.currImg, _ = common.DefaultBlankImage(size)
+	ib.currImg, _ = common.DefaultBlankImage(common.Size)
 	ib.ExtendBaseWidget(ib)
-	ib.Refresh()
 	return ib
 }
 
@@ -79,38 +71,7 @@ func (ib *ImageBrowser) UpdatePath(path string) {
 }
 
 func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
-	return widget.NewSimpleRenderer(container.NewStack(ib.currImg, ib.img))
-}
-
-func (d *ImageBrowser) Dragged(e *fyne.DragEvent) {
-	if !d.pressed {
-		return
-	}
-
-	d.drawCircle(e.Position)
-	d.img.Image = d.rgba
-	d.img.Refresh()
-}
-func (d *ImageBrowser) drawCircle(center fyne.Position) {
-	for r := -d.brushSize; r < d.brushSize; r += 1.0 {
-		for th := -math.Pi; th < math.Pi; th += math.Pi / 16 {
-			x := r*math.Cos(th) + float64(center.X)
-			y := r*math.Sin(th) + float64(center.Y)
-			d.rgba.Set(int(x), int(y), color.RGBA{R: 182, G: 245, B: 0, A: 127})
-		}
-	}
-}
-
-func (d *ImageBrowser) DragEnd() {
-	d.pressed = false
-}
-
-func (d *ImageBrowser) MouseDown(e *desktop.MouseEvent) {
-	d.pressed = true
-}
-
-func (d *ImageBrowser) MouseUp(e *desktop.MouseEvent) {
-	d.pressed = false
+	return widget.NewSimpleRenderer(ib.currImg)
 }
 
 func (ib *ImageBrowser) FocusLost()       {}
@@ -124,27 +85,20 @@ func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 	switch event.Name {
 	case fyne.KeyLeft:
 		ib.getPrevious()
+		ib.filenames <- string(common.ImageChanged)
 	case fyne.KeyRight:
 		ib.getNext()
+		ib.filenames <- string(common.ImageChanged)
 	case fyne.KeyS:
-		ib.SaveMask()
+		var dir string = path.Join(ib.path, "masks")
+		err := os.MkdirAll(dir, 0755)
+		if err != nil || (ib.index >= len(ib.files) || ib.index < 0) {
+			return
+		}
+		names := strings.Split(ib.files[ib.index], "/")
+		filename := path.Join(dir, "mask_"+names[len(names)-1])
+		ib.filenames <- filename
+		<-ib.saveCompleted
+		ib.getNext()
 	}
-}
-
-func (ib *ImageBrowser) SaveMask() {
-	var dir string = path.Join(ib.path, "masks")
-	err := os.Mkdir(dir, 0755)
-	if err == nil || (ib.index >= len(ib.files) || ib.index < 0) {
-		return
-	}
-	names := strings.Split(ib.files[ib.index], "/")
-	filename := path.Join(dir, "mask_"+names[len(names)-1])
-
-	file, err := os.Create(filename)
-	if err != nil {
-		fmt.Printf("error saving the image %s : %v\n", filename, err)
-	}
-	defer file.Close()
-
-	png.Encode(file, ib.rgba)
 }

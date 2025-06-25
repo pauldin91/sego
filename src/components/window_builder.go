@@ -1,8 +1,6 @@
 package components
 
 import (
-	"os"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -13,17 +11,20 @@ import (
 type WindowBuilder struct {
 	window     fyne.Window
 	ib         *ImageBrowser
+	dc         *DrawableCanvas
 	contents   []fyne.CanvasObject
 	canvasSize fyne.Size
 }
 
 func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
-	initPath, _ := os.Getwd()
 
+	fileChan := make(chan string)
+	saveCompleted := make(chan bool)
 	result := &WindowBuilder{
 		window:     a.NewWindow(title),
 		contents:   make([]fyne.CanvasObject, 0),
-		ib:         NewImageBrowser(size, initPath),
+		ib:         NewImageBrowser(fileChan, saveCompleted),
+		dc:         NewDrawableCanvas(fileChan, saveCompleted),
 		canvasSize: size,
 	}
 	result.window.Resize(result.canvasSize)
@@ -62,7 +63,7 @@ func (wb *WindowBuilder) onOpenFolderButtonClicked() {
 
 func (wb *WindowBuilder) setContent() {
 	containers := container.NewVBox()
-	containers.Add(wb.ib)
+	containers.Add(container.NewStack(wb.ib, wb.dc))
 
 	for _, obj := range wb.contents {
 		containers.Add(obj)
