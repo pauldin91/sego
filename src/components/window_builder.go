@@ -38,7 +38,7 @@ func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
 }
 
 func (wb *WindowBuilder) WithOpenFolderButton() *WindowBuilder {
-	openFolderButton := widget.NewButton("Open Folder", func() { wb.onOpenFolderButtonClicked() })
+	openFolderButton := widget.NewButton("Open Folder", wb.onOpenFolderButtonClicked)
 	openFolderButton.Resize(fyne.NewSize(60, 30))
 	wb.AddContent(openFolderButton)
 	return wb

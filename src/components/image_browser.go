@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -25,7 +24,7 @@ type ImageBrowser struct {
 
 func NewImageBrowser(fileChan chan string, saveCompleted chan bool) *ImageBrowser {
 	initPath, _ := os.Getwd()
-	initPath = path.Join(initPath, "..", "resources")
+	initPath = path.Join(initPath, common.DefaultResourceDir)
 	ib := &ImageBrowser{
 		path:          initPath,
 		index:         0,
@@ -39,6 +38,7 @@ func NewImageBrowser(fileChan chan string, saveCompleted chan bool) *ImageBrowse
 }
 
 func (ib *ImageBrowser) Refresh() {
+
 	if len(ib.files) == 0 {
 		return
 	}
@@ -48,6 +48,9 @@ func (ib *ImageBrowser) Refresh() {
 }
 
 func (ib *ImageBrowser) getNext() {
+
+	ib.filenames <- string(common.ImageChanged)
+
 	if len(ib.files) == 0 {
 		return
 	}
@@ -56,6 +59,9 @@ func (ib *ImageBrowser) getNext() {
 }
 
 func (ib *ImageBrowser) getPrevious() {
+
+	ib.filenames <- string(common.ImageChanged)
+
 	if len(ib.files) == 0 {
 		return
 	}
@@ -80,25 +86,26 @@ func (ib *ImageBrowser) TypedRune(r rune) {}
 func (ib *ImageBrowser) Focused() bool    { return true }
 
 func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
-	fmt.Printf("Key pressed: %s (%v)\n", event.Name, event.Physical)
 
 	switch event.Name {
 	case fyne.KeyLeft:
 		ib.getPrevious()
-		ib.filenames <- string(common.ImageChanged)
 	case fyne.KeyRight:
 		ib.getNext()
-		ib.filenames <- string(common.ImageChanged)
 	case fyne.KeyS:
-		var dir string = path.Join(ib.path, "masks")
-		err := os.MkdirAll(dir, 0755)
-		if err != nil || (ib.index >= len(ib.files) || ib.index < 0) {
-			return
-		}
-		names := strings.Split(ib.files[ib.index], "/")
-		filename := path.Join(dir, "mask_"+names[len(names)-1])
-		ib.filenames <- filename
+		ib.saveTrigger()
 		<-ib.saveCompleted
 		ib.getNext()
 	}
+}
+
+func (ib *ImageBrowser) saveTrigger() {
+	var dir string = path.Join(ib.path, common.DefaultMaskDir)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil || (ib.index >= len(ib.files) || ib.index < 0) {
+		return
+	}
+	names := strings.Split(ib.files[ib.index], "/")
+	filename := path.Join(dir, common.DefaultMaskPreffix+names[len(names)-1])
+	ib.filenames <- filename
 }

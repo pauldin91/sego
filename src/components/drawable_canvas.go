@@ -28,7 +28,7 @@ type DrawableCanvas struct {
 
 func NewDrawableCanvas(fileChan chan string, saveCompleted chan bool) *DrawableCanvas {
 	dc := &DrawableCanvas{
-		brushSize:     common.BrushSize,
+		brushSize:     common.DefaultBrushSize,
 		size:          common.Size,
 		filenames:     fileChan,
 		saveCompleted: saveCompleted,
