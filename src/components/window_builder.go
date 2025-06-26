@@ -11,20 +11,16 @@ import (
 type WindowBuilder struct {
 	window     fyne.Window
 	ib         *ImageBrowser
-	dc         *DrawableCanvas
 	contents   []fyne.CanvasObject
 	canvasSize fyne.Size
 }
 
 func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
 
-	fileChan := make(chan string)
-	saveCompleted := make(chan bool)
 	result := &WindowBuilder{
 		window:     a.NewWindow(title),
 		contents:   make([]fyne.CanvasObject, 0),
-		ib:         NewImageBrowser(fileChan, saveCompleted),
-		dc:         NewDrawableCanvas(fileChan, saveCompleted),
+		ib:         NewImageBrowser(),
 		canvasSize: size,
 	}
 	result.window.Resize(result.canvasSize)
@@ -63,7 +59,7 @@ func (wb *WindowBuilder) onOpenFolderButtonClicked() {
 
 func (wb *WindowBuilder) setContent() {
 	containers := container.NewVBox()
-	containers.Add(container.NewStack(wb.ib, wb.dc))
+	containers.Add(wb.ib)
 
 	for _, obj := range wb.contents {
 		containers.Add(obj)
