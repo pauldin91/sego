@@ -100,7 +100,7 @@ func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 }
 
 func (ib *ImageBrowser) saveTrigger() {
-	var dir string = path.Join(ib.path, common.DefaultMaskDir)
+	var dir string = ib.path
 	err := os.MkdirAll(dir, 0755)
 	if err != nil || (ib.index >= len(ib.files) || ib.index < 0) {
 		return

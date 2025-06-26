@@ -6,7 +6,6 @@ type BrowserStatus string
 
 const (
 	DefaultBrushSize   float64       = 15.0
-	DefaultMaskDir     string        = "masks"
 	DefaultMaskPreffix string        = "mask_"
 	DefaultResourceDir string        = "../resources"
 	ImageChanged       BrowserStatus = "Changed"
