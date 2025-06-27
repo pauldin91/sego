@@ -127,7 +127,6 @@ func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 		ib.canvas.IncBrush()
 	case fyne.KeyMinus:
 		ib.canvas.DecBrush()
-
 	case fyne.KeyC:
 		ib.clear()
 	case fyne.KeyEscape:
