@@ -35,14 +35,21 @@ func (ib *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (wb *WindowBuilder) WithSidebarMenu() *WindowBuilder {
-	res := NewSidebarMenu(wb.ib)
-	wb.top.Add(res.getBrushButtons())
+	res := NewSidebarMenu(wb.ib).
+		WithIncreaseBrushSizeButton().
+		WithDecreaseBrushSizeButton().
+		WithToggleBrushButton()
+
+	wb.top.Add(res.Build())
 	return wb
 }
 
 func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
-	res := NewBottomMenu(wb.ib, wb.window)
-	wb.bottom.Add(res.getButtons())
+	res := NewBottomMenu(wb.ib, wb.window).
+		WithOpenFolderButton().
+		WithLoadButton().
+		WithClearButton()
+	wb.bottom.Add(res.Build())
 	return wb
 }
 
@@ -53,9 +60,9 @@ func (wb *WindowBuilder) WithDefaultCanvas() *WindowBuilder {
 
 func (wb *WindowBuilder) Refresh() {
 	wb.combined.Add(wb.top)
-	wb.combined.Add(wb.bottom)
+	wb.combined.Add(container.NewCenter(wb.bottom))
 
-	wb.window.SetContent(container.NewCenter(wb.combined))
+	wb.window.SetContent(wb.combined)
 	wb.window.Canvas().Focus(wb.ib)
 	wb.window.Resize(wb.canvasSize)
 	wb.window.SetTitle(wb.ib.title)

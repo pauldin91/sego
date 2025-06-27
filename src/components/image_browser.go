@@ -57,7 +57,7 @@ func (ib *ImageBrowser) getNext() {
 	if len(ib.files) == 0 {
 		return
 	}
-	ib.clear()
+	ib.Clear()
 
 	ib.index = (ib.index + 1) % len(ib.files)
 	ib.Refresh()
@@ -67,13 +67,13 @@ func (ib *ImageBrowser) getPrevious() {
 	if len(ib.files) == 0 {
 		return
 	}
-	ib.clear()
+	ib.Clear()
 	ib.index = (ib.index - 1 + len(ib.files)) % len(ib.files)
 	ib.Refresh()
 }
 
 func (ib *ImageBrowser) UpdatePath(path string) {
-	ib.clear()
+	ib.Clear()
 	ib.path = path
 	ib.index = 0
 	ib.files = common.ListDir(ib.path)
@@ -105,7 +105,7 @@ func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
 	return widget.NewSimpleRenderer(container.NewStack(ib.currImg, ib.canvas.img))
 }
 
-func (dc *ImageBrowser) clear() {
+func (dc *ImageBrowser) Clear() {
 	dc.pressed = false
 	dc.canvas.clear()
 }
@@ -128,7 +128,7 @@ func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 	case fyne.KeyMinus:
 		ib.canvas.DecBrush()
 	case fyne.KeyC:
-		ib.clear()
+		ib.Clear()
 	case fyne.KeyEscape:
 		os.Exit(0)
 	}
@@ -145,7 +145,7 @@ func (ib *ImageBrowser) Save() {
 		filename = path.Join(dir, common.DefaultMaskPreffix+filepath.Base(ib.files[ib.index]))
 	}
 	ib.canvas.SaveMask(filename)
-	ib.clear()
+	ib.Clear()
 }
 
 func (d *ImageBrowser) DragEnd()                        { d.pressed = false }
@@ -165,4 +165,8 @@ func (d *ImageBrowser) Inc() {
 
 func (d *ImageBrowser) Dec() {
 	d.canvas.DecBrush()
+}
+
+func (d *ImageBrowser) ToogleBrush() {
+	d.canvas.Toggle()
 }

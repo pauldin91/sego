@@ -23,8 +23,7 @@ func NewBottomMenu(ib *ImageBrowser, parent fyne.Window) *BottomMenu {
 	}
 }
 
-func (wb *BottomMenu) getButtons() *fyne.Container {
-	wb.WithOpenFolderButton().WithLoadButton()
+func (wb *BottomMenu) Build() *fyne.Container {
 	return container.NewCenter(wb.buttons)
 }
 
@@ -34,6 +33,22 @@ func (wb *BottomMenu) WithOpenFolderButton() *BottomMenu {
 	openFolderButton.Show()
 	wb.buttons.Add(openFolderButton)
 	return wb
+}
+
+func (wb *BottomMenu) onOpenFolderButtonClicked() {
+	fd := dialog.NewFolderOpen(func(lu fyne.ListableURI, err error) {
+		if err != nil || lu == nil {
+			return
+		}
+		wb.ib.UpdatePath(lu.Path())
+
+	}, wb.parent)
+
+	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
+	if err == nil {
+		fd.SetLocation(uri)
+	}
+	fd.Show()
 }
 
 func (wb *BottomMenu) WithLoadButton() *BottomMenu {
@@ -61,18 +76,15 @@ func (wb *BottomMenu) onLoadFileButtonClicked() {
 	fd.Show()
 }
 
-func (wb *BottomMenu) onOpenFolderButtonClicked() {
-	fd := dialog.NewFolderOpen(func(lu fyne.ListableURI, err error) {
-		if err != nil || lu == nil {
-			return
-		}
-		wb.ib.UpdatePath(lu.Path())
+func (wb *BottomMenu) WithClearButton() *BottomMenu {
+	loadFileButton := widget.NewButton("Clear", wb.onClearButtonClicked)
+	loadFileButton.Resize(common.DefaultButtonSize)
+	loadFileButton.Show()
+	wb.buttons.Add(loadFileButton)
 
-	}, wb.parent)
+	return wb
+}
 
-	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
-	if err == nil {
-		fd.SetLocation(uri)
-	}
-	fd.Show()
+func (wb *BottomMenu) onClearButtonClicked() {
+	wb.ib.Clear()
 }

@@ -9,35 +9,68 @@ import (
 )
 
 type SidebarMenu struct {
-	buttons []fyne.CanvasObject
-	ib      *ImageBrowser
+	buttons      *fyne.Container
+	ib           *ImageBrowser
+	toggleButton *widget.Button
 }
 
 func NewSidebarMenu(ib *ImageBrowser) *SidebarMenu {
 	return &SidebarMenu{
-		buttons: make([]fyne.CanvasObject, 0),
+		buttons: container.NewVBox(),
 		ib:      ib,
 	}
 }
 
-func (wb *SidebarMenu) getBrushButtons() *fyne.Container {
-	iconButtons := container.NewVBox()
+func (wb *SidebarMenu) Build() *fyne.Container {
 
+	return container.NewCenter(wb.buttons)
+}
+
+func (wb *SidebarMenu) WithIncreaseBrushSizeButton() *SidebarMenu {
 	plusButton := widget.NewButton("", wb.onIncreaseBrushButton)
 	plusButton.Icon = theme.ContentAddIcon()
 	plusButton.Resize(common.DefaultIconSize)
-	minusButton := widget.NewButton("", wb.onDecreaseBrushButton)
-	minusButton.Icon = theme.ContentRemoveIcon()
-	minusButton.Resize(common.DefaultIconSize)
+	wb.buttons.Add(plusButton)
 
-	iconButtons.Add(plusButton)
-	iconButtons.Add(minusButton)
-	return container.NewCenter(iconButtons)
+	return wb
 }
+
 func (wb *SidebarMenu) onIncreaseBrushButton() {
 	wb.ib.Inc()
 }
 
+func (wb *SidebarMenu) WithDecreaseBrushSizeButton() *SidebarMenu {
+	minusButton := widget.NewButton("", wb.onDecreaseBrushButton)
+	minusButton.Icon = theme.ContentRemoveIcon()
+	minusButton.Resize(common.DefaultIconSize)
+	wb.buttons.Add(minusButton)
+
+	return wb
+}
+
 func (wb *SidebarMenu) onDecreaseBrushButton() {
 	wb.ib.Dec()
+}
+
+func (wb *SidebarMenu) WithToggleBrushButton() *SidebarMenu {
+	minusButton := widget.NewButton("", wb.onToggleBrushClicked)
+	if wb.ib.canvas.toogleBrush {
+		minusButton.Icon = theme.ContentRedoIcon()
+	} else {
+		minusButton.Icon = theme.ContentClearIcon()
+	}
+	minusButton.Resize(common.DefaultIconSize)
+	wb.toggleButton = minusButton
+	wb.buttons.Add(wb.toggleButton)
+
+	return wb
+}
+
+func (wb *SidebarMenu) onToggleBrushClicked() {
+	wb.ib.ToogleBrush()
+	if wb.ib.canvas.toogleBrush {
+		wb.toggleButton.Icon = theme.ColorChromaticIcon()
+	} else {
+		wb.toggleButton.Icon = theme.ColorAchromaticIcon()
+	}
 }

@@ -16,16 +16,20 @@ import (
 
 type DrawableCanvas struct {
 	widget.BaseWidget
-	brushSize float64
-	size      fyne.Size
-	img       *canvas.Image
-	rgba      *image.RGBA
+	brushSize   float64
+	size        fyne.Size
+	img         *canvas.Image
+	rgba        *image.RGBA
+	toogleBrush bool
+	color       color.RGBA
 }
 
 func NewDrawableCanvas() *DrawableCanvas {
 	dc := &DrawableCanvas{
-		brushSize: common.DefaultBrushSize,
-		size:      common.DefaultCanvasSize,
+		brushSize:   common.DefaultBrushSize,
+		size:        common.DefaultCanvasSize,
+		toogleBrush: true,
+		color:       common.DefaultPaintColor,
 	}
 	dc.img, dc.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
 	dc.ExtendBaseWidget(dc)
@@ -52,7 +56,7 @@ func (d *DrawableCanvas) drawCircle(center fyne.Position) {
 		for th := -math.Pi; th < math.Pi; th += math.Pi / 16 {
 			x := r*math.Cos(th) + float64(center.X)
 			y := r*math.Sin(th) + float64(center.Y)
-			d.rgba.Set(int(x), int(y), color.RGBA{R: 182, G: 245, B: 0, A: 127})
+			d.rgba.Set(int(x), int(y), d.color)
 		}
 	}
 }
@@ -81,5 +85,15 @@ func (dc *DrawableCanvas) IncBrush() {
 func (dc *DrawableCanvas) DecBrush() {
 	if dc.brushSize >= 2*common.DefaultBrushChange {
 		dc.brushSize -= common.DefaultBrushChange
+	}
+}
+
+func (dc *DrawableCanvas) Toggle() {
+	if !dc.toogleBrush {
+		dc.color = common.DefaultPaintColor
+		dc.toogleBrush = true
+	} else {
+		dc.color = color.RGBA{R: 0, G: 0, B: 0, A: 0}
+		dc.toogleBrush = false
 	}
 }

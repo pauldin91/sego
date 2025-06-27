@@ -1,6 +1,10 @@
 package common
 
-import "fyne.io/fyne/v2"
+import (
+	"image/color"
+
+	"fyne.io/fyne/v2"
+)
 
 type BrowserStatus string
 
@@ -16,6 +20,7 @@ const (
 var DefaultCanvasSize fyne.Size = fyne.NewSize(600, 400)
 var DefaultButtonSize fyne.Size = fyne.NewSize(60, 40)
 var DefaultIconSize fyne.Size = fyne.NewSize(40, 40)
+var DefaultPaintColor color.RGBA = color.RGBA{R: 182, G: 245, B: 0, A: 127}
 
 var imageExts = map[string]bool{
 	".jpg":  true,
