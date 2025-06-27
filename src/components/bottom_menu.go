@@ -43,12 +43,7 @@ func (wb *BottomMenu) onOpenFolderButtonClicked() {
 		wb.ib.UpdatePath(lu.Path())
 
 	}, wb.parent)
-
-	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
-	if err == nil {
-		fd.SetLocation(uri)
-	}
-	fd.Show()
+	wb.setLocation(fd)
 }
 
 func (wb *BottomMenu) WithLoadButton() *BottomMenu {
@@ -66,14 +61,9 @@ func (wb *BottomMenu) onLoadFileButtonClicked() {
 			return
 		}
 		wb.ib.loadContent(lu.URI().Path())
-
 	}, wb.parent)
 
-	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
-	if err == nil {
-		fd.SetLocation(uri)
-	}
-	fd.Show()
+	wb.setLocation(fd)
 }
 
 func (wb *BottomMenu) WithClearButton() *BottomMenu {
@@ -87,4 +77,12 @@ func (wb *BottomMenu) WithClearButton() *BottomMenu {
 
 func (wb *BottomMenu) onClearButtonClicked() {
 	wb.ib.Clear()
+}
+
+func (wb *BottomMenu) setLocation(fd *dialog.FileDialog) {
+	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
+	if err == nil {
+		fd.SetLocation(uri)
+	}
+	fd.Show()
 }

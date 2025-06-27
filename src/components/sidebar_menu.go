@@ -22,7 +22,6 @@ func NewSidebarMenu(ib *ImageBrowser) *SidebarMenu {
 }
 
 func (wb *SidebarMenu) Build() *fyne.Container {
-
 	return container.NewCenter(wb.buttons)
 }
 
@@ -73,4 +72,5 @@ func (wb *SidebarMenu) updateToogleIcon() {
 	} else {
 		wb.toggleButton.Icon = theme.ColorAchromaticIcon()
 	}
+	wb.buttons.Refresh()
 }

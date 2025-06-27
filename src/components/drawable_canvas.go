@@ -45,6 +45,7 @@ func (ib *DrawableCanvas) SaveMask(filename string) {
 	file, err := os.Create(filename)
 	if err != nil {
 		fmt.Printf("error saving the image %s : %v\n", filename, err)
+		return
 	}
 	defer file.Close()
 
