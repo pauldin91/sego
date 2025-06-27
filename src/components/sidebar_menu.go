@@ -53,14 +53,9 @@ func (wb *SidebarMenu) onDecreaseBrushButton() {
 }
 
 func (wb *SidebarMenu) WithToggleBrushButton() *SidebarMenu {
-	minusButton := widget.NewButton("", wb.onToggleBrushClicked)
-	if wb.ib.canvas.toogleBrush {
-		minusButton.Icon = theme.ContentRedoIcon()
-	} else {
-		minusButton.Icon = theme.ContentClearIcon()
-	}
-	minusButton.Resize(common.DefaultIconSize)
-	wb.toggleButton = minusButton
+	wb.toggleButton = widget.NewButton("", wb.onToggleBrushClicked)
+	wb.updateToogleIcon()
+	wb.toggleButton.Resize(common.DefaultIconSize)
 	wb.buttons.Add(wb.toggleButton)
 
 	return wb
@@ -68,6 +63,11 @@ func (wb *SidebarMenu) WithToggleBrushButton() *SidebarMenu {
 
 func (wb *SidebarMenu) onToggleBrushClicked() {
 	wb.ib.ToogleBrush()
+	wb.updateToogleIcon()
+	wb.buttons.Refresh()
+}
+
+func (wb *SidebarMenu) updateToogleIcon() {
 	if wb.ib.canvas.toogleBrush {
 		wb.toggleButton.Icon = theme.ColorChromaticIcon()
 	} else {
