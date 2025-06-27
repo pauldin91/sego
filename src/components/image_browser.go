@@ -158,3 +158,11 @@ func (d *ImageBrowser) Dragged(e *fyne.DragEvent) {
 
 	d.canvas.update(e.Position)
 }
+
+func (d *ImageBrowser) Inc() {
+	d.canvas.IncBrush()
+}
+
+func (d *ImageBrowser) Dec() {
+	d.canvas.DecBrush()
+}

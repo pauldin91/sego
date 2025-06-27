@@ -5,6 +5,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/pauldin91/sego/src/common"
 )
@@ -51,6 +52,28 @@ func (wb *WindowBuilder) WithLoadButton() *WindowBuilder {
 	return wb
 }
 
+func (wb *WindowBuilder) addBrushButtons() *fyne.Container {
+	iconButtons := container.NewVBox()
+
+	plusButton := widget.NewButton("", wb.onIncreaseBrushButton)
+	plusButton.Icon = theme.ContentAddIcon()
+	plusButton.Resize(common.DefaultIconSize)
+	minusButton := widget.NewButton("", wb.onDecreaseBrushButton)
+	minusButton.Icon = theme.ContentRemoveIcon()
+	minusButton.Resize(common.DefaultIconSize)
+
+	iconButtons.Add(plusButton)
+	iconButtons.Add(minusButton)
+	return container.NewCenter(iconButtons)
+}
+func (wb *WindowBuilder) onIncreaseBrushButton() {
+	wb.ib.Inc()
+}
+
+func (wb *WindowBuilder) onDecreaseBrushButton() {
+	wb.ib.Dec()
+}
+
 func (wb *WindowBuilder) onLoadFileButtonClicked() {
 	fd := dialog.NewFileOpen(func(lu fyne.URIReadCloser, err error) {
 		if err != nil || lu == nil {
@@ -93,10 +116,10 @@ func (wb *WindowBuilder) setContent() {
 	}
 
 	containers := container.NewVBox()
-	containers.Add(wb.ib)
+	containers.Add(container.NewHBox(wb.addBrushButtons(), wb.ib))
 	containers.Add(container.NewCenter(buttonContainer))
 
-	wb.window.SetContent(containers)
+	wb.window.SetContent(container.NewCenter(containers))
 	wb.window.Canvas().Focus(wb.ib)
 
 	wb.window.Resize(wb.canvasSize)
