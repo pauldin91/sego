@@ -6,12 +6,14 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
+	"github.com/pauldin91/sego/src/common"
 )
 
 type WindowBuilder struct {
 	window     fyne.Window
 	ib         *ImageBrowser
 	contents   []fyne.CanvasObject
+	buttons    []fyne.CanvasObject
 	canvasSize fyne.Size
 }
 
@@ -20,6 +22,7 @@ func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
 	result := &WindowBuilder{
 		window:     a.NewWindow(title),
 		contents:   make([]fyne.CanvasObject, 0),
+		buttons:    make([]fyne.CanvasObject, 0),
 		ib:         NewImageBrowser(),
 		canvasSize: size,
 	}
@@ -36,8 +39,33 @@ func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
 func (wb *WindowBuilder) WithOpenFolderButton() *WindowBuilder {
 	openFolderButton := widget.NewButton("Open Folder", wb.onOpenFolderButtonClicked)
 	openFolderButton.Resize(fyne.NewSize(60, 30))
-	wb.AddContent(openFolderButton)
+	wb.buttons = append(wb.buttons, openFolderButton)
 	return wb
+}
+
+func (wb *WindowBuilder) WithLoadButton() *WindowBuilder {
+	loadFileButton := widget.NewButton("Load File", wb.onLoadFileButtonClicked)
+	loadFileButton.Resize(common.DefaultButtonSize)
+	wb.buttons = append(wb.buttons, loadFileButton)
+
+	return wb
+}
+
+func (wb *WindowBuilder) onLoadFileButtonClicked() {
+	fd := dialog.NewFileOpen(func(lu fyne.URIReadCloser, err error) {
+		if err != nil || lu == nil {
+			return
+		}
+		wb.ib.loadContent(lu.URI().Path())
+		wb.setContent()
+
+	}, wb.window)
+
+	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
+	if err == nil {
+		fd.SetLocation(uri)
+	}
+	fd.Show()
 }
 
 func (wb *WindowBuilder) onOpenFolderButtonClicked() {
@@ -58,12 +86,14 @@ func (wb *WindowBuilder) onOpenFolderButtonClicked() {
 }
 
 func (wb *WindowBuilder) setContent() {
+
+	buttonContainer := container.NewHBox()
+	for _, b := range wb.buttons {
+		buttonContainer.Add(b)
+	}
 	containers := container.NewVBox()
 	containers.Add(wb.ib)
-
-	for _, obj := range wb.contents {
-		containers.Add(obj)
-	}
+	containers.Add(buttonContainer)
 
 	wb.window.SetContent(containers)
 	wb.window.Canvas().Focus(wb.ib)

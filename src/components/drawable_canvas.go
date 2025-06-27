@@ -25,9 +25,9 @@ type DrawableCanvas struct {
 func NewDrawableCanvas() *DrawableCanvas {
 	dc := &DrawableCanvas{
 		brushSize: common.DefaultBrushSize,
-		size:      common.Size,
+		size:      common.DefaultCanvasSize,
 	}
-	dc.img, dc.rgba = common.DefaultBlankImage(common.Size)
+	dc.img, dc.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
 	dc.ExtendBaseWidget(dc)
 	return dc
 }
@@ -78,7 +78,7 @@ func (dc *DrawableCanvas) IncBrush() {
 }
 
 func (dc *DrawableCanvas) DecBrush() {
-	if dc.brushSize > 2*common.DefaultBrushChange {
+	if dc.brushSize >= 2*common.DefaultBrushChange {
 		dc.brushSize -= common.DefaultBrushChange
 	}
 }

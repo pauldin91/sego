@@ -3,6 +3,7 @@ package components
 import (
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -31,10 +32,10 @@ func NewImageBrowser() *ImageBrowser {
 	ib := &ImageBrowser{
 		path:   initPath,
 		index:  0,
-		size:   common.Size,
+		size:   common.DefaultCanvasSize,
 		canvas: NewDrawableCanvas(),
 	}
-	ib.currImg, _ = common.DefaultBlankImage(common.Size)
+	ib.currImg, _ = common.DefaultBlankImage(common.DefaultCanvasSize)
 	ib.ExtendBaseWidget(ib)
 	return ib
 }
@@ -71,6 +72,21 @@ func (ib *ImageBrowser) UpdatePath(path string) {
 	ib.path = path
 	ib.index = 0
 	ib.files = common.ListDir(ib.path)
+	ib.Refresh()
+}
+
+func (ib *ImageBrowser) loadContent(path string) {
+	ib.canvas.clear()
+	ib.path = filepath.Dir(path)
+
+	ib.index = 0
+	ib.files = common.ListDir(ib.path)
+	for i, f := range ib.files {
+		if f == path {
+			ib.index = i
+			break
+		}
+	}
 	ib.Refresh()
 }
 

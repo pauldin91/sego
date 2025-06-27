@@ -13,7 +13,8 @@ const (
 	DefaultBrushChange float64       = 1.0
 )
 
-var Size fyne.Size = fyne.NewSize(600, 400)
+var DefaultCanvasSize fyne.Size = fyne.NewSize(600, 400)
+var DefaultButtonSize fyne.Size = fyne.NewSize(60, 40)
 
 var imageExts = map[string]bool{
 	".jpg":  true,
