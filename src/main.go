@@ -13,8 +13,9 @@ func main() {
 
 	w := components.
 		NewWindowBuilder(common.DefaultCanvasSize, "Hakuna Matata", a).
-		WithOpenFolderButton().
-		WithLoadButton().
+		WithSidebarMenu().
+		WithDefaultCanvas().
+		WithBottomMenu().
 		Build()
 
 	w.ShowAndRun()

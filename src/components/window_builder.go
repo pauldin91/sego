@@ -3,18 +3,16 @@ package components
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/pauldin91/sego/src/common"
 )
 
 type WindowBuilder struct {
+	widget.BaseWidget
 	window     fyne.Window
 	ib         *ImageBrowser
-	contents   []fyne.CanvasObject
-	buttons    []fyne.CanvasObject
+	top        *fyne.Container
+	bottom     *fyne.Container
+	combined   *fyne.Container
 	canvasSize fyne.Size
 }
 
@@ -22,112 +20,49 @@ func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
 
 	result := &WindowBuilder{
 		window:     a.NewWindow(title),
-		contents:   make([]fyne.CanvasObject, 0),
-		buttons:    make([]fyne.CanvasObject, 0),
+		top:        container.NewHBox(),
+		bottom:     container.NewHBox(),
+		combined:   container.NewVBox(),
 		ib:         NewImageBrowser(),
 		canvasSize: size,
 	}
 	result.window.Resize(result.canvasSize)
-
+	result.ExtendBaseWidget(result)
 	return result
 }
+func (ib *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
+	return widget.NewSimpleRenderer(container.NewCenter(ib.combined))
+}
 
-func (wb *WindowBuilder) AddContent(content fyne.CanvasObject) *WindowBuilder {
-	wb.contents = append(wb.contents, content)
+func (wb *WindowBuilder) WithSidebarMenu() *WindowBuilder {
+	res := NewSidebarMenu(wb.ib)
+	wb.top.Add(res.getBrushButtons())
 	return wb
 }
 
-func (wb *WindowBuilder) WithOpenFolderButton() *WindowBuilder {
-	openFolderButton := widget.NewButton("Open Folder", wb.onOpenFolderButtonClicked)
-	openFolderButton.Resize(fyne.NewSize(60, 30))
-	wb.buttons = append(wb.buttons, openFolderButton)
+func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
+	res := NewBottomMenu(wb.ib, wb.window)
+	wb.bottom.Add(res.getButtons())
 	return wb
 }
 
-func (wb *WindowBuilder) WithLoadButton() *WindowBuilder {
-	loadFileButton := widget.NewButton("Load File", wb.onLoadFileButtonClicked)
-	loadFileButton.Resize(common.DefaultButtonSize)
-	wb.buttons = append(wb.buttons, loadFileButton)
-
+func (wb *WindowBuilder) WithDefaultCanvas() *WindowBuilder {
+	wb.top.Add(wb.ib)
 	return wb
 }
 
-func (wb *WindowBuilder) addBrushButtons() *fyne.Container {
-	iconButtons := container.NewVBox()
+func (wb *WindowBuilder) Refresh() {
+	wb.combined.Add(wb.top)
+	wb.combined.Add(wb.bottom)
 
-	plusButton := widget.NewButton("", wb.onIncreaseBrushButton)
-	plusButton.Icon = theme.ContentAddIcon()
-	plusButton.Resize(common.DefaultIconSize)
-	minusButton := widget.NewButton("", wb.onDecreaseBrushButton)
-	minusButton.Icon = theme.ContentRemoveIcon()
-	minusButton.Resize(common.DefaultIconSize)
-
-	iconButtons.Add(plusButton)
-	iconButtons.Add(minusButton)
-	return container.NewCenter(iconButtons)
-}
-func (wb *WindowBuilder) onIncreaseBrushButton() {
-	wb.ib.Inc()
-}
-
-func (wb *WindowBuilder) onDecreaseBrushButton() {
-	wb.ib.Dec()
-}
-
-func (wb *WindowBuilder) onLoadFileButtonClicked() {
-	fd := dialog.NewFileOpen(func(lu fyne.URIReadCloser, err error) {
-		if err != nil || lu == nil {
-			return
-		}
-		wb.ib.loadContent(lu.URI().Path())
-		wb.setContent()
-
-	}, wb.window)
-
-	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
-	if err == nil {
-		fd.SetLocation(uri)
-	}
-	fd.Show()
-}
-
-func (wb *WindowBuilder) onOpenFolderButtonClicked() {
-	fd := dialog.NewFolderOpen(func(lu fyne.ListableURI, err error) {
-		if err != nil || lu == nil {
-			return
-		}
-		wb.ib.UpdatePath(lu.Path())
-		wb.setContent()
-
-	}, wb.window)
-
-	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
-	if err == nil {
-		fd.SetLocation(uri)
-	}
-	fd.Show()
-}
-
-func (wb *WindowBuilder) setContent() {
-
-	buttonContainer := container.NewHBox()
-	for _, b := range wb.buttons {
-		buttonContainer.Add(b)
-	}
-
-	containers := container.NewVBox()
-	containers.Add(container.NewHBox(wb.addBrushButtons(), wb.ib))
-	containers.Add(container.NewCenter(buttonContainer))
-
-	wb.window.SetContent(container.NewCenter(containers))
+	wb.window.SetContent(container.NewCenter(wb.combined))
 	wb.window.Canvas().Focus(wb.ib)
-
 	wb.window.Resize(wb.canvasSize)
 	wb.window.SetTitle(wb.ib.title)
 	wb.window.Content().Refresh()
 }
 
 func (wb *WindowBuilder) Build() fyne.Window {
-	wb.setContent()
+	wb.Refresh()
 	return wb.window
 }
