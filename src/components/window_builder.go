@@ -91,14 +91,16 @@ func (wb *WindowBuilder) setContent() {
 	for _, b := range wb.buttons {
 		buttonContainer.Add(b)
 	}
+
 	containers := container.NewVBox()
 	containers.Add(wb.ib)
-	containers.Add(buttonContainer)
+	containers.Add(container.NewCenter(buttonContainer))
 
 	wb.window.SetContent(containers)
 	wb.window.Canvas().Focus(wb.ib)
 
 	wb.window.Resize(wb.canvasSize)
+	wb.window.SetTitle(wb.ib.title)
 	wb.window.Content().Refresh()
 }
 

@@ -4,7 +4,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -24,6 +23,7 @@ type ImageBrowser struct {
 	size    fyne.Size
 	canvas  *DrawableCanvas
 	pressed bool
+	title   string
 }
 
 func NewImageBrowser() *ImageBrowser {
@@ -36,6 +36,7 @@ func NewImageBrowser() *ImageBrowser {
 		canvas: NewDrawableCanvas(),
 	}
 	ib.currImg, _ = common.DefaultBlankImage(common.DefaultCanvasSize)
+	ib.title = "Canvas"
 	ib.ExtendBaseWidget(ib)
 	return ib
 }
@@ -48,6 +49,7 @@ func (ib *ImageBrowser) Refresh() {
 	imgPath := ib.files[ib.index]
 	ib.currImg.File = imgPath
 	ib.currImg.Refresh()
+	ib.title = filepath.Base(imgPath)
 }
 
 func (ib *ImageBrowser) getNext() {
@@ -55,6 +57,8 @@ func (ib *ImageBrowser) getNext() {
 	if len(ib.files) == 0 {
 		return
 	}
+	ib.clear()
+
 	ib.index = (ib.index + 1) % len(ib.files)
 	ib.Refresh()
 }
@@ -63,30 +67,37 @@ func (ib *ImageBrowser) getPrevious() {
 	if len(ib.files) == 0 {
 		return
 	}
+	ib.clear()
 	ib.index = (ib.index - 1 + len(ib.files)) % len(ib.files)
 	ib.Refresh()
 }
 
 func (ib *ImageBrowser) UpdatePath(path string) {
-	ib.canvas.clear()
+	ib.clear()
 	ib.path = path
 	ib.index = 0
 	ib.files = common.ListDir(ib.path)
 	ib.Refresh()
 }
 
-func (ib *ImageBrowser) loadContent(path string) {
-	ib.canvas.clear()
-	ib.path = filepath.Dir(path)
+func (ib *ImageBrowser) loadContent(selectedImgFile string) {
+	ib.path = filepath.Dir(selectedImgFile)
 
 	ib.index = 0
 	ib.files = common.ListDir(ib.path)
 	for i, f := range ib.files {
-		if f == path {
+		if f == selectedImgFile {
 			ib.index = i
 			break
 		}
 	}
+	name := common.DefaultMaskPreffix + filepath.Base(selectedImgFile)
+	mask := path.Join(ib.path, common.DefaultMaskDir, name)
+	if _, err := os.Stat(mask); err == nil {
+		ib.canvas.img.File = mask
+		ib.canvas.Refresh()
+	}
+
 	ib.Refresh()
 }
 
@@ -110,12 +121,15 @@ func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 	case fyne.KeyRight:
 		ib.getNext()
 	case fyne.KeyS:
-		ib.getNext()
 		ib.Save()
+		ib.getNext()
 	case fyne.KeyEqual:
-		ib.canvas.brushSize++
+		ib.canvas.IncBrush()
 	case fyne.KeyMinus:
-		ib.canvas.brushSize--
+		ib.canvas.DecBrush()
+
+	case fyne.KeyC:
+		ib.clear()
 	case fyne.KeyEscape:
 		os.Exit(0)
 	}
@@ -128,8 +142,8 @@ func (ib *ImageBrowser) Save() {
 	if err != nil || (ib.index >= len(ib.files) || ib.index < 0) {
 		filename = path.Join(dir, "empty_"+uuid.New().String()+".png")
 	} else {
-		names := strings.Split(ib.files[ib.index], "/")
-		filename = path.Join(dir, common.DefaultMaskPreffix+names[len(names)-1])
+
+		filename = path.Join(dir, common.DefaultMaskPreffix+filepath.Base(ib.files[ib.index]))
 	}
 	ib.canvas.SaveMask(filename)
 	ib.clear()

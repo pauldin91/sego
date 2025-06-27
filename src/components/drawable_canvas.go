@@ -57,14 +57,15 @@ func (d *DrawableCanvas) drawCircle(center fyne.Position) {
 	}
 }
 
-func (dc *DrawableCanvas) clear() {
+func (dc *DrawableCanvas) reset() {
+	dc.img.File = ""
+	dc.img.Image = dc.rgba
+	dc.Refresh()
+}
 
+func (dc *DrawableCanvas) clear() {
 	_, dc.rgba = common.DefaultBlankImage(dc.size)
-	fn := func() {
-		dc.img.Image = dc.rgba
-		dc.img.Refresh()
-	}
-	fyne.Do(fn)
+	fyne.Do(dc.reset)
 }
 
 func (dc *DrawableCanvas) update(e fyne.Position) {
