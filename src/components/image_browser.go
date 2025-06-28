@@ -84,7 +84,7 @@ func (ib *ImageBrowser) loadContent(selectedImgFile string) {
 }
 
 func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
-	return widget.NewSimpleRenderer(container.NewStack(ib.canvas.img, ib.currImg))
+	return widget.NewSimpleRenderer(container.NewStack(ib.currImg, ib.canvas.img))
 }
 
 func (ib *ImageBrowser) loadMask(selectedImgFile string) {
