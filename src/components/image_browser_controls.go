@@ -11,13 +11,19 @@ import (
 	"github.com/pauldin91/sego/src/common"
 )
 
-func (mlst *ImageBrowser) DragEnd()                        { mlst.pressed = false }
-func (mlst *ImageBrowser) MouseDown(e *desktop.MouseEvent) { mlst.pressed = true }
-func (mlst *ImageBrowser) MouseUp(e *desktop.MouseEvent)   { mlst.pressed = false }
-func (klst *ImageBrowser) FocusLost()                      {}
-func (klst *ImageBrowser) FocusGained()                    {}
-func (klst *ImageBrowser) TypedRune(r rune)                {}
-func (klst *ImageBrowser) Focused() bool                   { return true }
+func (mlst *ImageBrowser) DragEnd() {}
+func (mlst *ImageBrowser) MouseDown(e *desktop.MouseEvent) {
+	mlst.pressed = true
+
+	if canvas := fyne.CurrentApp().Driver().CanvasForObject(mlst); canvas != nil {
+		canvas.Focus(mlst)
+	}
+}
+func (mlst *ImageBrowser) MouseUp(e *desktop.MouseEvent) { mlst.pressed = false }
+func (klst *ImageBrowser) FocusLost()                    {}
+func (klst *ImageBrowser) FocusGained()                  {}
+func (klst *ImageBrowser) TypedRune(r rune)              {}
+func (klst *ImageBrowser) Focused() bool                 { return true }
 
 func (mlst *ImageBrowser) Dragged(e *fyne.DragEvent) {
 	if !mlst.pressed {

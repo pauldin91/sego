@@ -10,28 +10,38 @@ import (
 )
 
 type BottomMenu struct {
-	buttons *fyne.Container
-	ib      *ImageBrowser
-	parent  fyne.Window
+	buttons    *fyne.Container
+	ib         *ImageBrowser
+	parent     fyne.Window
+	btnMapping map[common.ButtonType]func()
 }
 
 func NewBottomMenu(ib *ImageBrowser, parent fyne.Window) *BottomMenu {
-	return &BottomMenu{
+	res := &BottomMenu{
 		buttons: container.NewHBox(),
 		ib:      ib,
 		parent:  parent,
 	}
+	res.btnMapping = map[common.ButtonType]func(){
+		common.OpenBtn:  res.onOpenFolderButtonClicked,
+		common.LoadBtn:  res.onLoadFileButtonClicked,
+		common.ClearBtn: res.onClearButtonClicked,
+	}
+	return res
 }
 
 func (wb *BottomMenu) Build() *fyne.Container {
 	return container.NewCenter(wb.buttons)
 }
 
-func (wb *BottomMenu) WithOpenFolderButton() *BottomMenu {
-	openFolderButton := widget.NewButton("Open Folder", wb.onOpenFolderButtonClicked)
-	openFolderButton.Resize(fyne.NewSize(60, 30))
-	openFolderButton.Show()
-	wb.buttons.Add(openFolderButton)
+func (wb *BottomMenu) WithButton(btnType common.ButtonType) *BottomMenu {
+	if _, ok := wb.btnMapping[btnType]; !ok {
+		return wb
+	}
+	button := widget.NewButton(string(btnType), wb.btnMapping[btnType])
+	button.Resize(fyne.NewSize(60, 30))
+	button.Show()
+	wb.buttons.Add(button)
 	return wb
 }
 
@@ -46,15 +56,6 @@ func (wb *BottomMenu) onOpenFolderButtonClicked() {
 	wb.setLocation(fd)
 }
 
-func (wb *BottomMenu) WithLoadButton() *BottomMenu {
-	loadFileButton := widget.NewButton("Load File", wb.onLoadFileButtonClicked)
-	loadFileButton.Resize(common.DefaultButtonSize)
-	loadFileButton.Show()
-	wb.buttons.Add(loadFileButton)
-
-	return wb
-}
-
 func (wb *BottomMenu) onLoadFileButtonClicked() {
 	fd := dialog.NewFileOpen(func(lu fyne.URIReadCloser, err error) {
 		if err != nil || lu == nil {
@@ -64,15 +65,6 @@ func (wb *BottomMenu) onLoadFileButtonClicked() {
 	}, wb.parent)
 
 	wb.setLocation(fd)
-}
-
-func (wb *BottomMenu) WithClearButton() *BottomMenu {
-	loadFileButton := widget.NewButton("Clear", wb.onClearButtonClicked)
-	loadFileButton.Resize(common.DefaultButtonSize)
-	loadFileButton.Show()
-	wb.buttons.Add(loadFileButton)
-
-	return wb
 }
 
 func (wb *BottomMenu) onClearButtonClicked() {

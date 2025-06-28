@@ -6,15 +6,24 @@ import (
 	"fyne.io/fyne/v2"
 )
 
-type BrowserStatus string
+type ButtonType string
+type SidebarButtonType string
 
 const (
-	DefaultBrushSize   float64       = 15.0
-	DefaultBrushChange float64       = 1.0
-	DefaultMaskPreffix string        = "mask_"
-	DefaultMaskDir     string        = "masks"
-	DefaultResourceDir string        = "../resources"
-	ImageChanged       BrowserStatus = "Changed"
+	DefaultBrushSize   float64 = 15.0
+	DefaultBrushChange float64 = 1.0
+	DefaultMaskPreffix string  = "mask_"
+	DefaultMaskDir     string  = "masks"
+	DefaultResourceDir string  = "../resources"
+)
+const (
+	OpenBtn  ButtonType = "Open Folder"
+	LoadBtn  ButtonType = "Load File"
+	ClearBtn ButtonType = "Clear Mask"
+
+	Toggle SidebarButtonType = "toggle"
+	IncBtn SidebarButtonType = "+"
+	DecBtn SidebarButtonType = "-"
 )
 
 var DefaultCanvasSize fyne.Size = fyne.NewSize(600, 400)

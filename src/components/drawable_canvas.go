@@ -54,10 +54,13 @@ func (ib *DrawableCanvas) SaveMask(filename string) {
 
 func (d *DrawableCanvas) drawCircle(center fyne.Position) {
 	for r := -d.brushSize; r < d.brushSize; r += 1.0 {
+		bounds := d.rgba.Bounds()
 		for th := -math.Pi; th < math.Pi; th += math.Pi / 16 {
 			x := r*math.Cos(th) + float64(center.X)
 			y := r*math.Sin(th) + float64(center.Y)
-			d.rgba.Set(int(x), int(y), d.color)
+			if int(x) >= bounds.Min.X && int(x) < bounds.Max.X && int(y) >= bounds.Min.Y && int(y) < bounds.Max.Y {
+				d.rgba.Set(int(x), int(y), d.color)
+			}
 		}
 	}
 }
@@ -80,7 +83,7 @@ func (dc *DrawableCanvas) update(e fyne.Position) {
 }
 
 func (dc *DrawableCanvas) IncBrush() {
-	dc.brushSize++
+	dc.brushSize += common.DefaultBrushChange
 }
 
 func (dc *DrawableCanvas) DecBrush() {

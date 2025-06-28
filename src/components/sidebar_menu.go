@@ -12,25 +12,53 @@ type SidebarMenu struct {
 	buttons      *fyne.Container
 	ib           *ImageBrowser
 	toggleButton *widget.Button
+	btnMapping   map[common.SidebarButtonType]func()
+	btnIconMap   map[common.SidebarButtonType]fyne.Resource
 }
 
 func NewSidebarMenu(ib *ImageBrowser) *SidebarMenu {
-	return &SidebarMenu{
+	res := &SidebarMenu{
 		buttons: container.NewVBox(),
 		ib:      ib,
 	}
+	res.btnMapping = map[common.SidebarButtonType]func(){
+		common.IncBtn: res.onIncreaseBrushButton,
+		common.DecBtn: res.onDecreaseBrushButton,
+		common.Toggle: res.onToggleBrushClicked,
+	}
+	res.btnIconMap = map[common.SidebarButtonType]fyne.Resource{
+		common.IncBtn: theme.ContentAddIcon(),
+		common.DecBtn: theme.ContentRemoveIcon(),
+	}
+
+	return res
 }
 
 func (wb *SidebarMenu) Build() *fyne.Container {
 	return container.NewCenter(wb.buttons)
 }
 
-func (wb *SidebarMenu) WithIncreaseBrushSizeButton() *SidebarMenu {
-	plusButton := widget.NewButton("", wb.onIncreaseBrushButton)
-	plusButton.Icon = theme.ContentAddIcon()
-	plusButton.Resize(common.DefaultIconSize)
-	wb.buttons.Add(plusButton)
+func (wb *SidebarMenu) WithButton(btnType common.SidebarButtonType) *SidebarMenu {
+	if _, ok := wb.btnMapping[btnType]; !ok {
+		return wb
+	}
+	if btnType == common.Toggle {
+		wb.withToggleBrushBtn()
+	} else {
+		plusButton := widget.NewButton("", wb.btnMapping[btnType])
+		plusButton.Icon = wb.btnIconMap[btnType]
+		plusButton.Resize(common.DefaultIconSize)
+		wb.buttons.Add(plusButton)
 
+	}
+	return wb
+}
+
+func (wb *SidebarMenu) withToggleBrushBtn() *SidebarMenu {
+	wb.toggleButton = widget.NewButton("", wb.onToggleBrushClicked)
+	wb.setToggleIcon()
+	wb.toggleButton.Resize(common.DefaultIconSize)
+	wb.buttons.Add(wb.toggleButton)
 	return wb
 }
 
@@ -38,35 +66,17 @@ func (wb *SidebarMenu) onIncreaseBrushButton() {
 	wb.ib.Inc()
 }
 
-func (wb *SidebarMenu) WithDecreaseBrushSizeButton() *SidebarMenu {
-	minusButton := widget.NewButton("", wb.onDecreaseBrushButton)
-	minusButton.Icon = theme.ContentRemoveIcon()
-	minusButton.Resize(common.DefaultIconSize)
-	wb.buttons.Add(minusButton)
-
-	return wb
-}
-
 func (wb *SidebarMenu) onDecreaseBrushButton() {
 	wb.ib.Dec()
 }
 
-func (wb *SidebarMenu) WithToggleBrushButton() *SidebarMenu {
-	wb.toggleButton = widget.NewButton("", wb.onToggleBrushClicked)
-	wb.updateToogleIcon()
-	wb.toggleButton.Resize(common.DefaultIconSize)
-	wb.buttons.Add(wb.toggleButton)
-
-	return wb
-}
-
 func (wb *SidebarMenu) onToggleBrushClicked() {
 	wb.ib.ToogleBrush()
-	wb.updateToogleIcon()
+	wb.setToggleIcon()
 	wb.buttons.Refresh()
 }
 
-func (wb *SidebarMenu) updateToogleIcon() {
+func (wb *SidebarMenu) setToggleIcon() {
 	if wb.ib.canvas.toogleBrush {
 		wb.toggleButton.Icon = theme.ColorChromaticIcon()
 	} else {
