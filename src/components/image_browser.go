@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
@@ -66,7 +65,6 @@ func (ib *ImageBrowser) Resize(size fyne.Size) {
 	ib.BaseWidget.Resize(size)
 	ib.currImg.Resize(size)
 	ib.canvas.Resize(size)
-	fmt.Println("Resized to:", size)
 }
 
 func (ib *ImageBrowser) loadContent(selectedImgFile string) {

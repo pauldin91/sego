@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
 	"image/png"
 	"math"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/widget"
 	"github.com/pauldin91/sego/src/common"
+	"golang.org/x/image/draw"
 )
 
 type DrawableCanvas struct {
@@ -86,22 +86,18 @@ func (dc *DrawableCanvas) IncBrush() {
 }
 
 func (dc *DrawableCanvas) Resize(size fyne.Size) {
-	dc.BaseWidget.Resize(size)
+	//dc.BaseWidget.Resize(size)
 
+	dc.BaseWidget.Resize(size)
 	width := int(size.Width)
 	height := int(size.Height)
 
 	newRGBA := image.NewRGBA(image.Rect(0, 0, width, height))
-
-	if dc.rgba != nil {
-		oldBounds := dc.rgba.Bounds()
-		drawBounds := oldBounds.Intersect(newRGBA.Bounds())
-		draw.Draw(newRGBA, drawBounds, dc.rgba, drawBounds.Min, draw.Src)
-	}
-
+	draw.CatmullRom.Scale(newRGBA, newRGBA.Bounds(), dc.rgba, dc.rgba.Bounds(), draw.Over, nil)
+	dc.img.Resize(size)
 	dc.rgba = newRGBA
 	dc.img.Image = dc.rgba
-	dc.Refresh()
+
 }
 
 func (dc *DrawableCanvas) DecBrush() {
