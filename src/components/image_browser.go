@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
@@ -21,7 +22,6 @@ type ImageBrowser struct {
 	index   int
 	files   []string
 	currImg *canvas.Image
-	size    fyne.Size
 	canvas  *DrawableCanvas
 	pressed bool
 	title   string
@@ -33,7 +33,6 @@ func NewImageBrowser() *ImageBrowser {
 	ib := &ImageBrowser{
 		path:   initPath,
 		index:  0,
-		size:   common.DefaultCanvasSize,
 		canvas: NewDrawableCanvas(),
 	}
 	ib.currImg, _ = common.DefaultBlankImage(common.DefaultCanvasSize)
@@ -62,6 +61,13 @@ func (ib *ImageBrowser) UpdatePath(path string) {
 	ib.Refresh()
 }
 
+func (ib *ImageBrowser) Resize(size fyne.Size) {
+	ib.BaseWidget.Resize(size)
+	ib.currImg.Resize(size)
+	ib.canvas.Resize(size)
+	fmt.Println("Resized to:", size)
+}
+
 func (ib *ImageBrowser) loadContent(selectedImgFile string) {
 	ib.path = filepath.Dir(selectedImgFile)
 
@@ -78,7 +84,7 @@ func (ib *ImageBrowser) loadContent(selectedImgFile string) {
 }
 
 func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
-	return widget.NewSimpleRenderer(container.NewStack(ib.currImg, ib.canvas.img))
+	return widget.NewSimpleRenderer(container.NewStack(ib.canvas.img, ib.currImg))
 }
 
 func (ib *ImageBrowser) loadMask(selectedImgFile string) {

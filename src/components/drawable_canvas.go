@@ -17,7 +17,6 @@ import (
 type DrawableCanvas struct {
 	widget.BaseWidget
 	brushSize   float64
-	size        fyne.Size
 	img         *canvas.Image
 	rgba        *image.RGBA
 	toogleBrush bool
@@ -27,7 +26,6 @@ type DrawableCanvas struct {
 func NewDrawableCanvas() *DrawableCanvas {
 	dc := &DrawableCanvas{
 		brushSize:   common.DefaultBrushSize,
-		size:        common.DefaultCanvasSize,
 		toogleBrush: true,
 		color:       common.DefaultPaintColor,
 	}
@@ -72,7 +70,7 @@ func (dc *DrawableCanvas) reset() {
 }
 
 func (dc *DrawableCanvas) clear() {
-	_, dc.rgba = common.DefaultBlankImage(dc.size)
+	_, dc.rgba = common.DefaultBlankImage(dc.BaseWidget.Size())
 	fyne.Do(dc.reset)
 }
 
@@ -84,6 +82,15 @@ func (dc *DrawableCanvas) update(e fyne.Position) {
 
 func (dc *DrawableCanvas) IncBrush() {
 	dc.brushSize += common.DefaultBrushChange
+}
+
+func (dc *DrawableCanvas) Resize(size fyne.Size) {
+	dc.BaseWidget.Resize(size)
+	img, rgba := common.DefaultBlankImage(size)
+	dc.img = img
+	dc.rgba = rgba
+	dc.img.Image = rgba
+	fmt.Println("Resized to:", size)
 }
 
 func (dc *DrawableCanvas) DecBrush() {

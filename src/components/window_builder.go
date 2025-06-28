@@ -9,27 +9,25 @@ import (
 
 type WindowBuilder struct {
 	widget.BaseWidget
-	window     fyne.Window
-	ib         *ImageBrowser
-	canvas     *fyne.Container
-	left       *fyne.Container
-	bottom     *fyne.Container
-	combined   *fyne.Container
-	canvasSize fyne.Size
+	window   fyne.Window
+	ib       *ImageBrowser
+	canvas   *fyne.Container
+	left     *fyne.Container
+	bottom   *fyne.Container
+	combined *fyne.Container
 }
 
 func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
 
 	result := &WindowBuilder{
-		window:     a.NewWindow(title),
-		canvas:     container.NewHBox(),
-		left:       container.NewVBox(),
-		bottom:     container.NewHBox(),
-		combined:   container.NewVBox(),
-		ib:         NewImageBrowser(),
-		canvasSize: size,
+		window:   a.NewWindow(title),
+		canvas:   container.NewHBox(),
+		left:     container.NewVBox(),
+		bottom:   container.NewHBox(),
+		combined: container.NewVBox(),
+		ib:       NewImageBrowser(),
 	}
-	result.window.Resize(result.canvasSize)
+	result.window.Resize(result.calcWindowSize())
 	result.ExtendBaseWidget(result)
 	return result
 }
@@ -65,13 +63,27 @@ func (wb *WindowBuilder) WithDefaultCanvas() *WindowBuilder {
 }
 
 func (wb *WindowBuilder) Refresh() {
-	wb.combined.Add(container.NewBorder(nil, container.NewCenter(wb.bottom), container.NewCenter(wb.left), nil, container.NewCenter(wb.canvas)))
+	wb.combined = container.NewBorder(
+		nil,
+		container.NewCenter(wb.bottom),
+		container.NewCenter(wb.left),
+		nil,
+		container.NewStack(wb.ib),
+	)
 
 	wb.window.SetContent(wb.combined)
 	wb.window.Canvas().Focus(wb.ib)
-	wb.window.Resize(fyne.NewSize(800, 600))
+	wb.Resize(wb.calcWindowSize())
 	wb.window.SetTitle(wb.ib.title)
 	wb.window.Content().Refresh()
+}
+
+func (wb *WindowBuilder) calcWindowSize() fyne.Size {
+
+	var width = wb.window.Canvas().Size().Width + common.DefaultIconSize.Width + common.DefaultPaddingSize.Width
+	var height = wb.window.Canvas().Size().Height + common.DefaultButtonSize.Height + common.DefaultPaddingSize.Height
+	wb.ib.Resize(wb.window.Canvas().Size())
+	return fyne.NewSize(width, height)
 }
 
 func (wb *WindowBuilder) Build() fyne.Window {
