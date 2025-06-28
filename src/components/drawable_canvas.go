@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
 	"image/png"
 	"math"
 	"os"
@@ -30,6 +31,7 @@ func NewDrawableCanvas() *DrawableCanvas {
 		color:       common.DefaultPaintColor,
 	}
 	dc.img, dc.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
+	dc.img.FillMode = canvas.ImageFillContain
 	dc.ExtendBaseWidget(dc)
 	return dc
 }
@@ -64,7 +66,6 @@ func (d *DrawableCanvas) drawCircle(center fyne.Position) {
 }
 
 func (dc *DrawableCanvas) reset() {
-	dc.img.File = ""
 	dc.img.Image = dc.rgba
 	dc.Refresh()
 }
@@ -86,11 +87,21 @@ func (dc *DrawableCanvas) IncBrush() {
 
 func (dc *DrawableCanvas) Resize(size fyne.Size) {
 	dc.BaseWidget.Resize(size)
-	img, rgba := common.DefaultBlankImage(size)
-	dc.img = img
-	dc.rgba = rgba
-	dc.img.Image = rgba
-	fmt.Println("Resized to:", size)
+
+	width := int(size.Width)
+	height := int(size.Height)
+
+	newRGBA := image.NewRGBA(image.Rect(0, 0, width, height))
+
+	if dc.rgba != nil {
+		oldBounds := dc.rgba.Bounds()
+		drawBounds := oldBounds.Intersect(newRGBA.Bounds())
+		draw.Draw(newRGBA, drawBounds, dc.rgba, drawBounds.Min, draw.Src)
+	}
+
+	dc.rgba = newRGBA
+	dc.img.Image = dc.rgba
+	dc.Refresh()
 }
 
 func (dc *DrawableCanvas) DecBrush() {

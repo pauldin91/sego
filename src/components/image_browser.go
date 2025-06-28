@@ -36,6 +36,7 @@ func NewImageBrowser() *ImageBrowser {
 		canvas: NewDrawableCanvas(),
 	}
 	ib.currImg, _ = common.DefaultBlankImage(common.DefaultCanvasSize)
+	ib.currImg.FillMode = canvas.ImageFillContain
 	ib.title = "Canvas"
 	ib.ExtendBaseWidget(ib)
 	return ib
@@ -84,7 +85,12 @@ func (ib *ImageBrowser) loadContent(selectedImgFile string) {
 }
 
 func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
-	return widget.NewSimpleRenderer(container.NewStack(ib.currImg, ib.canvas.img))
+
+	stack := container.NewStack(
+		ib.currImg,
+		ib.canvas.img,
+	)
+	return widget.NewSimpleRenderer(stack)
 }
 
 func (ib *ImageBrowser) loadMask(selectedImgFile string) {

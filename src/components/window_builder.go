@@ -32,7 +32,7 @@ func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
 	return result
 }
 func (ib *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
-	return widget.NewSimpleRenderer(container.NewCenter(ib.combined))
+	return widget.NewSimpleRenderer(ib.combined)
 }
 
 func (wb *WindowBuilder) WithSidebarMenu() *WindowBuilder {
@@ -73,7 +73,7 @@ func (wb *WindowBuilder) Refresh() {
 
 	wb.window.SetContent(wb.combined)
 	wb.window.Canvas().Focus(wb.ib)
-	wb.Resize(wb.calcWindowSize())
+	wb.window.Resize(wb.calcWindowSize())
 	wb.window.SetTitle(wb.ib.title)
 	wb.window.Content().Refresh()
 }
@@ -82,7 +82,6 @@ func (wb *WindowBuilder) calcWindowSize() fyne.Size {
 
 	var width = wb.window.Canvas().Size().Width + common.DefaultIconSize.Width + common.DefaultPaddingSize.Width
 	var height = wb.window.Canvas().Size().Height + common.DefaultButtonSize.Height + common.DefaultPaddingSize.Height
-	wb.ib.Resize(wb.window.Canvas().Size())
 	return fyne.NewSize(width, height)
 }
 
