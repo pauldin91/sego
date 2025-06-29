@@ -2,6 +2,7 @@ package components
 
 import (
 	"image"
+	"image/color"
 	"image/png"
 	"os"
 	"path"
@@ -18,27 +19,37 @@ import (
 
 type ImageBrowser struct {
 	widget.BaseWidget
-	path    string
-	index   int
-	files   []string
-	currImg *canvas.Image
-	canvas  *DrawableCanvas
-	pressed bool
-	title   string
+	path        string
+	index       int
+	files       []string
+	currImg     *canvas.Image
+	pressed     bool
+	title       string
+	brushSize   float64
+	img         *canvas.Image
+	rgba        *image.RGBA
+	toogleBrush bool
+	color       color.RGBA
 }
 
 func NewImageBrowser() *ImageBrowser {
 	initPath, _ := os.Getwd()
 	initPath = path.Join(initPath, common.DefaultResourceDir)
 	ib := &ImageBrowser{
-		path:   initPath,
-		index:  0,
-		canvas: NewDrawableCanvas(),
+		path:        initPath,
+		index:       0,
+		brushSize:   common.DefaultBrushSize,
+		toogleBrush: true,
+		color:       common.DefaultPaintColor,
 	}
-	ib.currImg, _ = common.DefaultBlankImage(common.DefaultCanvasSize)
+	ib.currImg, ib.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
 	ib.currImg.FillMode = canvas.ImageFillContain
 	ib.title = "Canvas"
 	ib.currImg.SetMinSize(common.DefaultCanvasSize)
+
+	ib.img = canvas.NewImageFromImage(ib.rgba)
+	ib.img.FillMode = canvas.ImageFillContain
+	ib.img.SetMinSize(common.DefaultCanvasSize)
 	ib.ExtendBaseWidget(ib)
 	return ib
 }
@@ -53,7 +64,6 @@ func (ib *ImageBrowser) Refresh() {
 	ib.title = filepath.Base(imgPath)
 	ib.loadMask(ib.files[ib.index])
 	ib.currImg.Refresh()
-	ib.canvas.Refresh()
 }
 
 func (ib *ImageBrowser) UpdatePath(path string) {
@@ -67,7 +77,13 @@ func (ib *ImageBrowser) UpdatePath(path string) {
 func (ib *ImageBrowser) Resize(size fyne.Size) {
 	ib.BaseWidget.Resize(size)
 	ib.currImg.Resize(size)
-	ib.canvas.Resize(size)
+	width := int(size.Width)
+	height := int(size.Height)
+	newRGBA := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.CatmullRom.Scale(newRGBA, newRGBA.Bounds(), ib.rgba, ib.rgba.Bounds(), draw.Over, nil)
+	ib.img.Resize(size)
+	ib.rgba = newRGBA
+	ib.img.Image = ib.rgba
 }
 
 func (ib *ImageBrowser) loadContent(selectedImgFile string) {
@@ -89,7 +105,7 @@ func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
 
 	stack := container.NewStack(
 		ib.currImg,
-		ib.canvas.img,
+		ib.img,
 	)
 	return widget.NewSimpleRenderer(stack)
 }
@@ -104,9 +120,9 @@ func (ib *ImageBrowser) loadMask(selectedImgFile string) {
 			rgba := image.NewRGBA(bounds)
 			draw.Draw(rgba, bounds, img, image.Point{}, draw.Src)
 
-			ib.canvas.rgba = rgba
-			ib.canvas.img.Image = rgba
-			ib.canvas.Refresh()
+			ib.rgba = rgba
+			ib.img.Image = rgba
+			ib.img.Refresh()
 		}
 
 	}

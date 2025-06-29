@@ -73,21 +73,21 @@ func (wb *SidebarMenu) onColorPickerClicked() {
 }
 
 func (wb *SidebarMenu) onIncreaseBrushButton() {
-	wb.ib.Inc()
+	wb.ib.IncBrush()
 }
 
 func (wb *SidebarMenu) onDecreaseBrushButton() {
-	wb.ib.Dec()
+	wb.ib.DecBrush()
 }
 
 func (wb *SidebarMenu) onToggleBrushClicked() {
-	wb.ib.ToogleBrush()
+	wb.ib.Toggle()
 	wb.setToggleIcon()
 	wb.buttons.Refresh()
 }
 
 func (wb *SidebarMenu) setToggleIcon() {
-	if wb.ib.canvas.toogleBrush {
+	if wb.ib.toogleBrush {
 		wb.toggleButton.Icon = theme.ColorChromaticIcon()
 	} else {
 		wb.toggleButton.Icon = theme.ColorAchromaticIcon()
