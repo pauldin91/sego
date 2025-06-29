@@ -17,17 +17,16 @@ type WindowBuilder struct {
 	combined *fyne.Container
 }
 
-func NewWindowBuilder(size fyne.Size, title string, a fyne.App) *WindowBuilder {
+func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
 
 	result := &WindowBuilder{
 		window:   a.NewWindow(title),
+		ib:       NewImageBrowser(),
 		canvas:   container.NewHBox(),
 		left:     container.NewVBox(),
 		bottom:   container.NewHBox(),
 		combined: container.NewVBox(),
-		ib:       NewImageBrowser(),
 	}
-	result.window.Resize(result.calcWindowSize())
 	result.ExtendBaseWidget(result)
 	return result
 }

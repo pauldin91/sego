@@ -19,7 +19,7 @@ func DefaultBlankImage(size fyne.Size) (*canvas.Image, *image.RGBA) {
 
 	currImg := canvas.NewImageFromImage(rgba)
 	currImg.FillMode = canvas.ImageFillContain
-	currImg.SetMinSize(size)
+	currImg.Resize(size)
 	return currImg, rgba
 }
 

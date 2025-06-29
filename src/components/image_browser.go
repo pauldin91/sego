@@ -38,6 +38,7 @@ func NewImageBrowser() *ImageBrowser {
 	ib.currImg, _ = common.DefaultBlankImage(common.DefaultCanvasSize)
 	ib.currImg.FillMode = canvas.ImageFillContain
 	ib.title = "Canvas"
+	ib.currImg.SetMinSize(common.DefaultCanvasSize)
 	ib.ExtendBaseWidget(ib)
 	return ib
 }
@@ -52,6 +53,7 @@ func (ib *ImageBrowser) Refresh() {
 	ib.title = filepath.Base(imgPath)
 	ib.loadMask(ib.files[ib.index])
 	ib.currImg.Refresh()
+	ib.canvas.Refresh()
 }
 
 func (ib *ImageBrowser) UpdatePath(path string) {
@@ -100,7 +102,7 @@ func (ib *ImageBrowser) loadMask(selectedImgFile string) {
 		if img, err := png.Decode(file); err == nil {
 			bounds := img.Bounds()
 			rgba := image.NewRGBA(bounds)
-			draw.Draw(rgba, bounds, img, bounds.Min, draw.Src)
+			draw.Draw(rgba, bounds, img, image.Point{}, draw.Src)
 
 			ib.canvas.rgba = rgba
 			ib.canvas.img.Image = rgba

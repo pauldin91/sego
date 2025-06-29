@@ -32,6 +32,9 @@ func NewDrawableCanvas() *DrawableCanvas {
 	}
 	dc.img, dc.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
 	dc.img.FillMode = canvas.ImageFillContain
+	dc.img.SetMinSize(common.DefaultCanvasSize)
+	dc.img.Image = dc.rgba
+
 	dc.ExtendBaseWidget(dc)
 	return dc
 }
