@@ -1,17 +1,12 @@
 package components
 
 import (
-	"fmt"
 	"image/color"
-	"image/png"
 	"math"
 	"os"
-	"path"
-	"path/filepath"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
-	"github.com/google/uuid"
 	"github.com/pauldin91/sego/src/common"
 )
 
@@ -57,20 +52,14 @@ func (klst *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 }
 
 func (ib *ImageBrowser) getNext() {
-	if len(ib.files) == 0 {
-		return
-	}
+	ib.fb.Next()
 	ib.Clear()
-	ib.index = (ib.index + 1) % len(ib.files)
 	ib.Refresh()
 }
 
 func (ib *ImageBrowser) getPrevious() {
-	if len(ib.files) == 0 {
-		return
-	}
+	ib.fb.Previous()
 	ib.Clear()
-	ib.index = (ib.index - 1 + len(ib.files)) % len(ib.files)
 	ib.Refresh()
 }
 func (d *ImageBrowser) ChooseColor(c color.Color) {
@@ -84,22 +73,13 @@ func (d *ImageBrowser) ChooseColor(c color.Color) {
 
 func (dc *ImageBrowser) Clear() {
 	dc.pressed = false
-	_, dc.rgba = common.DefaultBlankImage(dc.BaseWidget.Size())
+	dc.rgba = common.DefaultBlankImage(dc.BaseWidget.Size())
 	dc.img.Image = dc.rgba
 	fyne.Do(dc.img.Refresh)
 }
 
 func (ib *ImageBrowser) Save() {
-	var dir string = path.Join(ib.path, common.DefaultMaskDir)
-	err := os.MkdirAll(dir, 0755)
-	var filename string
-
-	if err != nil || (ib.index >= len(ib.files) || ib.index < 0) {
-		filename = path.Join(dir, "empty_"+uuid.New().String()+".png")
-	} else {
-		filename = path.Join(dir, common.DefaultMaskPreffix+filepath.Base(ib.files[ib.index]))
-	}
-	ib.SaveMask(filename)
+	common.SaveMask(ib.rgba, ib.fb.GetMaskName())
 	ib.Clear()
 	ib.getNext()
 }
@@ -128,18 +108,6 @@ func (dc *ImageBrowser) Toggle() {
 		dc.color = color.RGBA{R: 0, G: 0, B: 0, A: 0}
 		dc.toogleBrush = false
 	}
-}
-
-func (ib *ImageBrowser) SaveMask(filename string) {
-
-	file, err := os.Create(filename)
-	if err != nil {
-		fmt.Printf("error saving the image %s : %v\n", filename, err)
-		return
-	}
-	defer file.Close()
-
-	png.Encode(file, ib.rgba)
 }
 
 func (d *ImageBrowser) drawCircle(center fyne.Position) {

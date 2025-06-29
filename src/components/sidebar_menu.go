@@ -68,7 +68,8 @@ func (wb *SidebarMenu) withToggleBrushBtn() *SidebarMenu {
 }
 
 func (wb *SidebarMenu) onColorPickerClicked() {
-	cd := dialog.NewColorPicker("", "", wb.ib.ChooseColor, wb.parent)
+	cd := dialog.NewColorPicker("Annotation Color", "Choose an annotation color", wb.ib.ChooseColor, wb.parent)
+	cd.Advanced = true
 	cd.Show()
 }
 

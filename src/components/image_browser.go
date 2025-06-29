@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"image/png"
 	"os"
-	"path"
 	"path/filepath"
 
 	"fyne.io/fyne/v2"
@@ -17,9 +16,7 @@ import (
 
 type ImageBrowser struct {
 	widget.BaseWidget
-	path        string
-	index       int
-	files       []string
+	fb          *FileBrowser
 	currImg     *canvas.Image
 	pressed     bool
 	title       string
@@ -31,22 +28,21 @@ type ImageBrowser struct {
 }
 
 func NewImageBrowser() *ImageBrowser {
-	initPath, _ := os.Getwd()
-	initPath = path.Join(initPath, common.DefaultResourceDir)
+
 	ib := &ImageBrowser{
-		path:        initPath,
-		index:       0,
 		brushSize:   common.DefaultBrushSize,
 		toogleBrush: true,
 		color:       common.DefaultPaintColor,
+		fb:          NewFileBrowser(),
 	}
-	ib.currImg, ib.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
-	ib.currImg.FillMode = canvas.ImageFillContain
-	ib.title = "Canvas"
-	ib.currImg.SetMinSize(common.DefaultCanvasSize)
-
+	ib.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
+	ib.currImg = canvas.NewImageFromImage(ib.rgba)
 	ib.img = canvas.NewImageFromImage(ib.rgba)
+	ib.currImg.FillMode = canvas.ImageFillContain
 	ib.img.FillMode = canvas.ImageFillContain
+	ib.title = "Canvas"
+
+	ib.currImg.SetMinSize(common.DefaultCanvasSize)
 	ib.img.SetMinSize(common.DefaultCanvasSize)
 	ib.ExtendBaseWidget(ib)
 	return ib
@@ -54,21 +50,18 @@ func NewImageBrowser() *ImageBrowser {
 
 func (ib *ImageBrowser) Refresh() {
 
-	if len(ib.files) == 0 {
+	ib.currImg.File = ib.fb.GetFilename()
+	if ib.currImg.File == "" {
 		return
 	}
-	imgPath := ib.files[ib.index]
-	ib.currImg.File = imgPath
-	ib.title = filepath.Base(imgPath)
-	ib.loadMask(ib.files[ib.index])
+	ib.title = filepath.Base(ib.currImg.File)
+	ib.loadMask(ib.currImg.File)
 	ib.currImg.Refresh()
 }
 
 func (ib *ImageBrowser) UpdatePath(path string) {
 	ib.Clear()
-	ib.path = path
-	ib.index = 0
-	ib.files = common.ListDir(ib.path)
+	ib.fb.UpdatePath(path)
 	ib.Refresh()
 }
 
@@ -81,17 +74,7 @@ func (ib *ImageBrowser) Resize(size fyne.Size) {
 }
 
 func (ib *ImageBrowser) loadContent(selectedImgFile string) {
-	ib.path = filepath.Dir(selectedImgFile)
-
-	ib.index = 0
-	ib.files = common.ListDir(ib.path)
-	for i, f := range ib.files {
-		if f == selectedImgFile {
-			ib.index = i
-			break
-		}
-	}
-
+	ib.fb.FindFilename(selectedImgFile)
 	ib.Refresh()
 }
 
@@ -105,8 +88,7 @@ func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (ib *ImageBrowser) loadMask(selectedImgFile string) {
-	name := common.DefaultMaskPreffix + filepath.Base(selectedImgFile)
-	mask := path.Join(ib.path, common.DefaultMaskDir, name)
+	mask := ib.fb.GetMaskOrDefault(selectedImgFile)
 	if file, err := os.Open(mask); err == nil {
 		defer file.Close()
 		if img, err := png.Decode(file); err == nil {

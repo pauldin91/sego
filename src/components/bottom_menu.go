@@ -72,7 +72,7 @@ func (wb *BottomMenu) onClearButtonClicked() {
 }
 
 func (wb *BottomMenu) setLocation(fd *dialog.FileDialog) {
-	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.path))
+	uri, err := storage.ListerForURI(storage.NewFileURI(wb.ib.fb.GetPath()))
 	if err == nil {
 		fd.SetLocation(uri)
 	}
