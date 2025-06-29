@@ -86,7 +86,7 @@ func (dc *ImageBrowser) Clear() {
 	dc.pressed = false
 	_, dc.rgba = common.DefaultBlankImage(dc.BaseWidget.Size())
 	dc.img.Image = dc.rgba
-	fyne.Do(dc.Refresh)
+	fyne.Do(dc.img.Refresh)
 }
 
 func (ib *ImageBrowser) Save() {
