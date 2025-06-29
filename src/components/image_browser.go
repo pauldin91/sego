@@ -59,7 +59,7 @@ func (ib *ImageBrowser) Refresh() {
 	ib.currImg.Refresh()
 }
 
-func (ib *ImageBrowser) UpdatePath(path string) {
+func (ib *ImageBrowser) UpdateImage(path string) {
 	ib.Clear()
 	ib.fb.UpdatePath(path)
 	ib.Refresh()
@@ -73,8 +73,8 @@ func (ib *ImageBrowser) Resize(size fyne.Size) {
 	ib.img.Image = ib.rgba
 }
 
-func (ib *ImageBrowser) loadContent(selectedImgFile string) {
-	ib.fb.FindFilename(selectedImgFile)
+func (ib *ImageBrowser) LoadContent(selectedImgFile string) {
+	ib.fb.SetIndexForFilename(selectedImgFile)
 	ib.Refresh()
 }
 
@@ -88,7 +88,7 @@ func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (ib *ImageBrowser) loadMask(selectedImgFile string) {
-	mask := ib.fb.GetMaskOrDefault(selectedImgFile)
+	mask := ib.fb.GetMask(selectedImgFile)
 	if file, err := os.Open(mask); err == nil {
 		defer file.Close()
 		if img, err := png.Decode(file); err == nil {

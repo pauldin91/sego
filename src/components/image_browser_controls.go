@@ -79,7 +79,7 @@ func (dc *ImageBrowser) Clear() {
 }
 
 func (ib *ImageBrowser) Save() {
-	common.SaveMask(ib.rgba, ib.fb.GetMaskName())
+	common.SaveMask(ib.rgba, ib.fb.GetMaskOrDefault())
 	ib.Clear()
 	ib.getNext()
 }

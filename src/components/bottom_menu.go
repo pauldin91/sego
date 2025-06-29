@@ -50,7 +50,7 @@ func (wb *BottomMenu) onOpenFolderButtonClicked() {
 		if err != nil || lu == nil {
 			return
 		}
-		wb.ib.UpdatePath(lu.Path())
+		wb.ib.UpdateImage(lu.Path())
 
 	}, wb.parent)
 	wb.setLocation(fd)
@@ -61,7 +61,7 @@ func (wb *BottomMenu) onLoadFileButtonClicked() {
 		if err != nil || lu == nil {
 			return
 		}
-		wb.ib.loadContent(lu.URI().Path())
+		wb.ib.LoadContent(lu.URI().Path())
 	}, wb.parent)
 
 	wb.setLocation(fd)

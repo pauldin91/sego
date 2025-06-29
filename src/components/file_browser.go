@@ -26,7 +26,7 @@ func NewFileBrowser() *FileBrowser {
 	return res
 }
 
-func (fb *FileBrowser) GetMaskOrDefault(selectedImgFile string) string {
+func (fb *FileBrowser) GetMask(selectedImgFile string) string {
 	name := common.DefaultMaskPreffix + filepath.Base(selectedImgFile)
 	return path.Join(fb.path, common.DefaultMaskDir, name)
 }
@@ -46,7 +46,7 @@ func (fb *FileBrowser) GetFilename() string {
 	return fb.files[fb.index]
 }
 
-func (fb *FileBrowser) FindFilename(selectedImgFile string) {
+func (fb *FileBrowser) SetIndexForFilename(selectedImgFile string) {
 	fb.path = filepath.Dir(selectedImgFile)
 	fb.index = 0
 	fb.files = common.ListDir(fb.path)
@@ -72,7 +72,7 @@ func (ib *FileBrowser) Previous() {
 	ib.index = (ib.index - 1 + len(ib.files)) % len(ib.files)
 }
 
-func (ib *FileBrowser) GetMaskName() string {
+func (ib *FileBrowser) GetMaskOrDefault() string {
 	var dir string = path.Join(ib.path, common.DefaultMaskDir)
 	err := os.MkdirAll(dir, 0755)
 	var filename string
