@@ -1,4 +1,4 @@
-package components
+package viewer
 
 import (
 	"image"
@@ -12,30 +12,32 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/pauldin91/sego/src/common"
+	"github.com/pauldin91/sego/src/components/browser"
+	"github.com/pauldin91/sego/src/components/utils"
 )
 
-type ImageBrowser struct {
+type ImageViewer struct {
 	widget.BaseWidget
-	fb                *FileBrowser
+	fb                *browser.FileBrowser
 	currImg           *canvas.Image
 	pressed           bool
 	title             string
 	brushSize         float64
 	img               *canvas.Image
 	rgba              *image.RGBA
-	toogleBrush       bool
+	toggleBrush       bool
 	color             color.RGBA
 	transparrentColor color.RGBA
 	parent            fyne.Window
 }
 
-func NewImageBrowser(parent fyne.Window) *ImageBrowser {
+func NewImageBrowser(parent fyne.Window) *ImageViewer {
 
-	ib := &ImageBrowser{
+	ib := &ImageViewer{
 		brushSize:         common.DefaultBrushSize,
-		toogleBrush:       true,
+		toggleBrush:       true,
 		color:             common.DefaultPaintColor,
-		fb:                NewFileBrowser(),
+		fb:                browser.NewFileBrowser(),
 		transparrentColor: common.DefaultTransparrentColor,
 		parent:            parent,
 	}
@@ -52,7 +54,7 @@ func NewImageBrowser(parent fyne.Window) *ImageBrowser {
 	return ib
 }
 
-func (ib *ImageBrowser) Refresh() {
+func (ib *ImageViewer) Refresh() {
 
 	ib.currImg.File = ib.fb.GetFilename()
 	if ib.currImg.File == "" {
@@ -63,26 +65,26 @@ func (ib *ImageBrowser) Refresh() {
 	ib.currImg.Refresh()
 }
 
-func (ib *ImageBrowser) UpdateImage(path string) {
+func (ib *ImageViewer) UpdateImage(path string) {
 	ib.Clear()
 	ib.fb.UpdatePath(path)
 	ib.Refresh()
 }
 
-func (ib *ImageBrowser) Resize(size fyne.Size) {
+func (ib *ImageViewer) Resize(size fyne.Size) {
 	ib.BaseWidget.Resize(size)
 	ib.currImg.Resize(size)
 	ib.img.Resize(size)
-	ib.rgba = common.ScaleImage(ib.rgba, fyne.NewSize(size.Width, size.Height))
+	ib.rgba = utils.ScaleImage(ib.rgba, fyne.NewSize(size.Width, size.Height))
 	ib.img.Image = ib.rgba
 }
 
-func (ib *ImageBrowser) LoadContent(selectedImgFile string) {
+func (ib *ImageViewer) LoadContent(selectedImgFile string) {
 	ib.fb.SetIndexForFilename(selectedImgFile)
 	ib.Refresh()
 }
 
-func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
+func (ib *ImageViewer) CreateRenderer() fyne.WidgetRenderer {
 
 	stack := container.NewStack(
 		ib.currImg,
@@ -91,16 +93,19 @@ func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
 	return widget.NewSimpleRenderer(stack)
 }
 
-func (ib *ImageBrowser) loadMask(selectedImgFile string) {
+func (ib *ImageViewer) loadMask(selectedImgFile string) {
 	mask := ib.fb.GetMask(selectedImgFile)
 	if file, err := os.Open(mask); err == nil {
 		defer file.Close()
 		if img, err := png.Decode(file); err == nil {
 
-			ib.rgba = common.ScaleImage(img, ib.Size())
+			ib.rgba = utils.ScaleImage(img, ib.Size())
 			ib.img.Image = ib.rgba
 			ib.img.Refresh()
 		}
 
 	}
 }
+
+func (ib *ImageViewer) GetToggle() bool  { return ib.toggleBrush }
+func (ib *ImageViewer) GetTitle() string { return ib.title }

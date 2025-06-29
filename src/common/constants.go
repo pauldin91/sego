@@ -33,7 +33,7 @@ var DefaultButtonSize fyne.Size = fyne.NewSize(60, 40)
 var DefaultIconSize fyne.Size = fyne.NewSize(40, 40)
 var DefaultPaddingSize fyne.Size = fyne.NewSize(3, 3)
 
-var DefaultPaintColor color.RGBA = color.RGBA{R: 182, G: 245, B: 0, A: 127}
+var DefaultPaintColor color.RGBA = color.RGBA{R: 41, G: 111, B: 246, A: 185}
 var DefaultTransparrentColor color.RGBA = color.RGBA{R: 0, G: 0, B: 0, A: 0}
 
 var imageExts = map[string]bool{

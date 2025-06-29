@@ -1,4 +1,4 @@
-package components
+package controls
 
 import (
 	"image/color"
@@ -9,18 +9,19 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/pauldin91/sego/src/common"
+	"github.com/pauldin91/sego/src/components/viewer"
 )
 
 type BottomMenu struct {
 	buttons      *fyne.Container
-	ib           *ImageBrowser
+	ib           *viewer.ImageViewer
 	parent       fyne.Window
 	toggleButton *widget.Button
 	btnMapping   map[common.BottomButtonType]func()
 	btnIconMap   map[common.BottomButtonType]fyne.Resource
 }
 
-func NewBottomMenu(ib *ImageBrowser, parent fyne.Window) *BottomMenu {
+func NewBottomMenu(ib *viewer.ImageViewer, parent fyne.Window) *BottomMenu {
 	res := &BottomMenu{
 		buttons: container.NewHBox(),
 		ib:      ib,
@@ -93,7 +94,7 @@ func (wb *BottomMenu) onToggleBrushClicked() {
 }
 
 func (wb *BottomMenu) setToggleIcon() {
-	if wb.ib.toogleBrush {
+	if wb.ib.GetToggle() {
 		wb.toggleButton.Icon = theme.ColorChromaticIcon()
 	} else {
 		wb.toggleButton.Icon = theme.ColorAchromaticIcon()

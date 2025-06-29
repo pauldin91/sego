@@ -1,4 +1,4 @@
-package components
+package browser
 
 import (
 	"os"

@@ -5,12 +5,14 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/pauldin91/sego/src/common"
+	"github.com/pauldin91/sego/src/components/controls"
+	browser "github.com/pauldin91/sego/src/components/viewer"
 )
 
 type WindowBuilder struct {
 	widget.BaseWidget
 	window   fyne.Window
-	ib       *ImageBrowser
+	ib       *browser.ImageViewer
 	canvas   *fyne.Container
 	left     *fyne.Container
 	combined *fyne.Container
@@ -24,7 +26,7 @@ func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
 		left:     container.NewHBox(),
 		combined: container.NewVBox(),
 	}
-	result.ib = NewImageBrowser(result.window)
+	result.ib = browser.NewImageBrowser(result.window)
 	result.ExtendBaseWidget(result)
 	return result
 }
@@ -33,7 +35,7 @@ func (wb *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
-	res := NewBottomMenu(wb.ib, wb.window).
+	res := controls.NewBottomMenu(wb.ib, wb.window).
 		WithButton(common.ColorBtn).
 		WithButton(common.IncBtn).
 		WithButton(common.DecBtn).
@@ -61,7 +63,7 @@ func (wb *WindowBuilder) Refresh() {
 	wb.window.SetContent(wb.combined)
 	wb.window.Canvas().Focus(wb.ib)
 	wb.window.Resize(wb.calcWindowSize())
-	wb.window.SetTitle(wb.ib.title)
+	wb.window.SetTitle(wb.ib.GetTitle())
 	wb.window.Content().Refresh()
 }
 
@@ -78,9 +80,9 @@ func (wb *WindowBuilder) Build() fyne.Window {
 }
 
 func (wb *WindowBuilder) WithMainMenu() *WindowBuilder {
-	open := fyne.NewMenuItem("Open Folder", wb.ib.onOpenFolderButtonClicked)
-	load := fyne.NewMenuItem("Load Image", wb.ib.onLoadFileButtonClicked)
-	clear := fyne.NewMenuItem("Clear Mask", wb.ib.onClearButtonClicked)
+	open := fyne.NewMenuItem("Open Folder", wb.ib.OnOpenFolderButtonClicked)
+	load := fyne.NewMenuItem("Load Image", wb.ib.OnLoadFileButtonClicked)
+	clear := fyne.NewMenuItem("Clear Mask", wb.ib.OnClearButtonClicked)
 	menu := fyne.NewMainMenu(fyne.NewMenu("Main Menu", open, load, clear))
 	wb.window.SetMainMenu(menu)
 
