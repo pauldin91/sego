@@ -12,9 +12,9 @@ func main() {
 
 	w := components.
 		NewWindowBuilder("Hakuna Matata", a).
-		WithSidebarMenu().
-		WithDefaultCanvas().
 		WithBottomMenu().
+		WithDefaultCanvas().
+		WithMainMenu().
 		Build()
 
 	w.ShowAndRun()

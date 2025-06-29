@@ -7,24 +7,25 @@ import (
 )
 
 type ButtonType string
-type SidebarButtonType string
+type BottomButtonType string
 
 const (
-	DefaultBrushSize   float64 = 15.0
-	DefaultBrushChange float64 = 1.0
-	DefaultMaskPreffix string  = "mask_"
-	DefaultMaskDir     string  = "masks"
-	DefaultResourceDir string  = "../resources"
+	DefaultBrushSize    float64 = 15.0
+	DefaultMaxBrushSize float64 = 50.0
+	DefaultBrushChange  float64 = 1.0
+	DefaultMaskPreffix  string  = "mask_"
+	DefaultMaskDir      string  = "masks"
+	DefaultResourceDir  string  = "../resources"
 )
 const (
 	OpenBtn  ButtonType = "Open Folder"
 	LoadBtn  ButtonType = "Load File"
 	ClearBtn ButtonType = "Clear Mask"
 
-	Toggle   SidebarButtonType = "toggle"
-	IncBtn   SidebarButtonType = "+"
-	DecBtn   SidebarButtonType = "-"
-	ColorBtn SidebarButtonType = "O"
+	Toggle   BottomButtonType = "toggle"
+	IncBtn   BottomButtonType = "+"
+	DecBtn   BottomButtonType = "-"
+	ColorBtn BottomButtonType = "O"
 )
 
 var DefaultCanvasSize fyne.Size = fyne.NewSize(600, 400)
@@ -33,6 +34,7 @@ var DefaultIconSize fyne.Size = fyne.NewSize(40, 40)
 var DefaultPaddingSize fyne.Size = fyne.NewSize(3, 3)
 
 var DefaultPaintColor color.RGBA = color.RGBA{R: 182, G: 245, B: 0, A: 127}
+var DefaultTransparrentColor color.RGBA = color.RGBA{R: 0, G: 0, B: 0, A: 0}
 
 var imageExts = map[string]bool{
 	".jpg":  true,

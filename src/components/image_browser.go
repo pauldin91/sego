@@ -16,24 +16,28 @@ import (
 
 type ImageBrowser struct {
 	widget.BaseWidget
-	fb          *FileBrowser
-	currImg     *canvas.Image
-	pressed     bool
-	title       string
-	brushSize   float64
-	img         *canvas.Image
-	rgba        *image.RGBA
-	toogleBrush bool
-	color       color.RGBA
+	fb                *FileBrowser
+	currImg           *canvas.Image
+	pressed           bool
+	title             string
+	brushSize         float64
+	img               *canvas.Image
+	rgba              *image.RGBA
+	toogleBrush       bool
+	color             color.RGBA
+	transparrentColor color.RGBA
+	parent            fyne.Window
 }
 
-func NewImageBrowser() *ImageBrowser {
+func NewImageBrowser(parent fyne.Window) *ImageBrowser {
 
 	ib := &ImageBrowser{
-		brushSize:   common.DefaultBrushSize,
-		toogleBrush: true,
-		color:       common.DefaultPaintColor,
-		fb:          NewFileBrowser(),
+		brushSize:         common.DefaultBrushSize,
+		toogleBrush:       true,
+		color:             common.DefaultPaintColor,
+		fb:                NewFileBrowser(),
+		transparrentColor: common.DefaultTransparrentColor,
+		parent:            parent,
 	}
 	ib.rgba = common.DefaultBlankImage(common.DefaultCanvasSize)
 	ib.currImg = canvas.NewImageFromImage(ib.rgba)

@@ -13,7 +13,6 @@ type WindowBuilder struct {
 	ib       *ImageBrowser
 	canvas   *fyne.Container
 	left     *fyne.Container
-	bottom   *fyne.Container
 	combined *fyne.Container
 }
 
@@ -21,21 +20,20 @@ func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
 
 	result := &WindowBuilder{
 		window:   a.NewWindow(title),
-		ib:       NewImageBrowser(),
 		canvas:   container.NewHBox(),
-		left:     container.NewVBox(),
-		bottom:   container.NewHBox(),
+		left:     container.NewHBox(),
 		combined: container.NewVBox(),
 	}
+	result.ib = NewImageBrowser(result.window)
 	result.ExtendBaseWidget(result)
 	return result
 }
-func (ib *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
-	return widget.NewSimpleRenderer(ib.combined)
+func (wb *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
+	return widget.NewSimpleRenderer(wb.combined)
 }
 
-func (wb *WindowBuilder) WithSidebarMenu() *WindowBuilder {
-	res := NewSidebarMenu(wb.ib, wb.window).
+func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
+	res := NewBottomMenu(wb.ib, wb.window).
 		WithButton(common.ColorBtn).
 		WithButton(common.IncBtn).
 		WithButton(common.DecBtn).
@@ -43,17 +41,6 @@ func (wb *WindowBuilder) WithSidebarMenu() *WindowBuilder {
 		Build()
 
 	wb.left.Add(res)
-	return wb
-}
-
-func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
-	res := NewBottomMenu(wb.ib, wb.window).
-		WithButton(common.OpenBtn).
-		WithButton(common.LoadBtn).
-		WithButton(common.ClearBtn).
-		Build()
-
-	wb.bottom.Add(res)
 	return wb
 }
 
@@ -65,8 +52,8 @@ func (wb *WindowBuilder) WithDefaultCanvas() *WindowBuilder {
 func (wb *WindowBuilder) Refresh() {
 	wb.combined = container.NewBorder(
 		nil,
-		container.NewCenter(wb.bottom),
 		container.NewCenter(wb.left),
+		nil,
 		nil,
 		container.NewStack(wb.ib),
 	)
@@ -88,4 +75,14 @@ func (wb *WindowBuilder) calcWindowSize() fyne.Size {
 func (wb *WindowBuilder) Build() fyne.Window {
 	wb.Refresh()
 	return wb.window
+}
+
+func (wb *WindowBuilder) WithMainMenu() *WindowBuilder {
+	open := fyne.NewMenuItem("Open Folder", wb.ib.onOpenFolderButtonClicked)
+	load := fyne.NewMenuItem("Load Image", wb.ib.onLoadFileButtonClicked)
+	clear := fyne.NewMenuItem("Clear Mask", wb.ib.onClearButtonClicked)
+	menu := fyne.NewMainMenu(fyne.NewMenu("Main Menu", open, load, clear))
+	wb.window.SetMainMenu(menu)
+
+	return wb
 }
