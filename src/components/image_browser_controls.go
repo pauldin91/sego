@@ -18,7 +18,7 @@ import (
 func (mlst *ImageBrowser) DragEnd() {}
 func (mlst *ImageBrowser) MouseDown(e *desktop.MouseEvent) {
 	mlst.pressed = true
-
+	mlst.update(e.Position)
 	if canvas := fyne.CurrentApp().Driver().CanvasForObject(mlst); canvas != nil {
 		canvas.Focus(mlst)
 	}
@@ -85,7 +85,8 @@ func (d *ImageBrowser) ChooseColor(c color.Color) {
 func (dc *ImageBrowser) Clear() {
 	dc.pressed = false
 	_, dc.rgba = common.DefaultBlankImage(dc.BaseWidget.Size())
-	fyne.Do(dc.reset)
+	dc.img.Image = dc.rgba
+	fyne.Do(dc.Refresh)
 }
 
 func (ib *ImageBrowser) Save() {
@@ -152,9 +153,4 @@ func (d *ImageBrowser) drawCircle(center fyne.Position) {
 			}
 		}
 	}
-}
-
-func (dc *ImageBrowser) reset() {
-	dc.img.Image = dc.rgba
-	dc.Refresh()
 }

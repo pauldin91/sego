@@ -8,8 +8,6 @@ import (
 	"path"
 	"path/filepath"
 
-	"golang.org/x/image/draw"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -78,11 +76,7 @@ func (ib *ImageBrowser) Resize(size fyne.Size) {
 	ib.BaseWidget.Resize(size)
 	ib.currImg.Resize(size)
 	ib.img.Resize(size)
-	width := int(size.Width)
-	height := int(size.Height)
-	newRGBA := image.NewRGBA(image.Rect(0, 0, width, height))
-	draw.CatmullRom.Scale(newRGBA, newRGBA.Bounds(), ib.rgba, ib.rgba.Bounds(), draw.Src, nil)
-	ib.rgba = newRGBA
+	ib.rgba = common.ScaleImage(ib.rgba, fyne.NewSize(size.Width, size.Height))
 	ib.img.Image = ib.rgba
 }
 
@@ -116,14 +110,8 @@ func (ib *ImageBrowser) loadMask(selectedImgFile string) {
 	if file, err := os.Open(mask); err == nil {
 		defer file.Close()
 		if img, err := png.Decode(file); err == nil {
-			targetSize := ib.Size()
-			width := int(targetSize.Width)
-			height := int(targetSize.Height)
 
-			scaled := image.NewRGBA(image.Rect(0, 0, width, height))
-			draw.CatmullRom.Scale(scaled, scaled.Bounds(), img, img.Bounds(), draw.Over, nil)
-
-			ib.rgba = scaled
+			ib.rgba = common.ScaleImage(img, ib.Size())
 			ib.img.Image = ib.rgba
 			ib.img.Refresh()
 		}

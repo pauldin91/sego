@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
+	"golang.org/x/image/draw"
 )
 
 func DefaultBlankImage(size fyne.Size) (*canvas.Image, *image.RGBA) {
@@ -41,4 +41,14 @@ func ListDir(dir string) []string {
 func isImage(file string) bool {
 	ext := strings.ToLower(filepath.Ext(file))
 	return imageExts[ext]
+}
+
+func ScaleImage(img image.Image, dstSize fyne.Size) *image.RGBA {
+	width := int(dstSize.Width)
+	height := int(dstSize.Height)
+
+	scaled := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.CatmullRom.Scale(scaled, scaled.Bounds(), img, img.Bounds(), draw.Over, nil)
+
+	return scaled
 }
