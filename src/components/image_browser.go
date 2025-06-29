@@ -77,11 +77,11 @@ func (ib *ImageBrowser) UpdatePath(path string) {
 func (ib *ImageBrowser) Resize(size fyne.Size) {
 	ib.BaseWidget.Resize(size)
 	ib.currImg.Resize(size)
+	ib.img.Resize(size)
 	width := int(size.Width)
 	height := int(size.Height)
 	newRGBA := image.NewRGBA(image.Rect(0, 0, width, height))
-	draw.CatmullRom.Scale(newRGBA, newRGBA.Bounds(), ib.rgba, ib.rgba.Bounds(), draw.Over, nil)
-	ib.img.Resize(size)
+	draw.CatmullRom.Scale(newRGBA, newRGBA.Bounds(), ib.rgba, ib.rgba.Bounds(), draw.Src, nil)
 	ib.rgba = newRGBA
 	ib.img.Image = ib.rgba
 }
@@ -116,12 +116,15 @@ func (ib *ImageBrowser) loadMask(selectedImgFile string) {
 	if file, err := os.Open(mask); err == nil {
 		defer file.Close()
 		if img, err := png.Decode(file); err == nil {
-			bounds := img.Bounds()
-			rgba := image.NewRGBA(bounds)
-			draw.Draw(rgba, bounds, img, image.Point{}, draw.Src)
+			targetSize := ib.Size()
+			width := int(targetSize.Width)
+			height := int(targetSize.Height)
 
-			ib.rgba = rgba
-			ib.img.Image = rgba
+			scaled := image.NewRGBA(image.Rect(0, 0, width, height))
+			draw.CatmullRom.Scale(scaled, scaled.Bounds(), img, img.Bounds(), draw.Over, nil)
+
+			ib.rgba = scaled
+			ib.img.Image = ib.rgba
 			ib.img.Refresh()
 		}
 
