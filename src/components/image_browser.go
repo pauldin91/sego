@@ -2,11 +2,12 @@ package components
 
 import (
 	"image"
-	"image/draw"
 	"image/png"
 	"os"
 	"path"
 	"path/filepath"
+
+	"golang.org/x/image/draw"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"

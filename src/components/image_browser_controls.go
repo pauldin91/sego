@@ -1,6 +1,7 @@
 package components
 
 import (
+	"image/color"
 	"os"
 	"path"
 	"path/filepath"
@@ -69,7 +70,14 @@ func (ib *ImageBrowser) getPrevious() {
 	ib.index = (ib.index - 1 + len(ib.files)) % len(ib.files)
 	ib.Refresh()
 }
-
+func (d *ImageBrowser) ChooseColor(c color.Color) {
+	r, g, b, _ := c.RGBA()
+	d.canvas.color = color.RGBA{
+		R: uint8(r >> 8),
+		G: uint8(g >> 8),
+		B: uint8(b >> 8),
+		A: 127}
+}
 func (d *ImageBrowser) Inc()         { d.canvas.IncBrush() }
 func (d *ImageBrowser) Dec()         { d.canvas.DecBrush() }
 func (d *ImageBrowser) ToogleBrush() { d.canvas.Toggle() }

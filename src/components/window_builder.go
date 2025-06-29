@@ -36,7 +36,8 @@ func (ib *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (wb *WindowBuilder) WithSidebarMenu() *WindowBuilder {
-	res := NewSidebarMenu(wb.ib).
+	res := NewSidebarMenu(wb.ib, wb.window).
+		WithButton(common.ColorBtn).
 		WithButton(common.IncBtn).
 		WithButton(common.DecBtn).
 		WithButton(common.Toggle).

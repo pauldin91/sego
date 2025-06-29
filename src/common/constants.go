@@ -21,9 +21,10 @@ const (
 	LoadBtn  ButtonType = "Load File"
 	ClearBtn ButtonType = "Clear Mask"
 
-	Toggle SidebarButtonType = "toggle"
-	IncBtn SidebarButtonType = "+"
-	DecBtn SidebarButtonType = "-"
+	Toggle   SidebarButtonType = "toggle"
+	IncBtn   SidebarButtonType = "+"
+	DecBtn   SidebarButtonType = "-"
+	ColorBtn SidebarButtonType = "O"
 )
 
 var DefaultCanvasSize fyne.Size = fyne.NewSize(600, 400)

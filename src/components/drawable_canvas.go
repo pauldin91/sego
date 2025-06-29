@@ -86,7 +86,6 @@ func (dc *DrawableCanvas) IncBrush() {
 }
 
 func (dc *DrawableCanvas) Resize(size fyne.Size) {
-	//dc.BaseWidget.Resize(size)
 
 	dc.BaseWidget.Resize(size)
 	width := int(size.Width)
@@ -97,7 +96,6 @@ func (dc *DrawableCanvas) Resize(size fyne.Size) {
 	dc.img.Resize(size)
 	dc.rgba = newRGBA
 	dc.img.Image = dc.rgba
-
 }
 
 func (dc *DrawableCanvas) DecBrush() {
