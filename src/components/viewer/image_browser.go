@@ -46,9 +46,6 @@ func NewImageBrowser(parent fyne.Window) *ImageBrowser {
 	ib.currImg.FillMode = canvas.ImageFillContain
 	ib.img.FillMode = canvas.ImageFillContain
 	ib.title = "Canvas"
-
-	ib.currImg.SetMinSize(common.DefaultCanvasSize)
-	ib.img.SetMinSize(common.DefaultCanvasSize)
 	ib.ExtendBaseWidget(ib)
 	return ib
 }

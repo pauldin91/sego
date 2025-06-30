@@ -56,12 +56,17 @@ func (wb *BottomMenu) WithButtons(btnTypes ...common.BottomButtonType) *BottomMe
 		if _, ok := wb.btnMapping[btnType]; !ok {
 			return wb
 		}
-
-		plusButton := widget.NewButton("", wb.btnMapping[btnType])
-		plusButton.Icon = wb.btnIconMap[btnType]
-		plusButton.Resize(common.DefaultIncBrushSize)
-		vBox.Add(plusButton)
+		if btnType == common.Toggle {
+			wb.toggleButton = widget.NewButton("", wb.onToggleBrushClicked)
+			wb.setToggleIcon()
+			vBox.Add(wb.toggleButton)
+		} else {
+			plusButton := widget.NewButton("", wb.btnMapping[btnType])
+			plusButton.Icon = wb.btnIconMap[btnType]
+			vBox.Add(plusButton)
+		}
 	}
+	vBox.Resize(common.DefaultIconSize)
 	wb.buttons.Add(vBox)
 	return wb
 }
@@ -85,7 +90,6 @@ func (wb *BottomMenu) WithButton(btnType common.BottomButtonType) *BottomMenu {
 func (wb *BottomMenu) withToggleBrushBtn() *BottomMenu {
 	wb.toggleButton = widget.NewButton("", wb.onToggleBrushClicked)
 	wb.setToggleIcon()
-	wb.toggleButton.Resize(common.DefaultIconSize)
 	wb.buttons.Add(wb.toggleButton)
 	return wb
 }

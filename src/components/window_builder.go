@@ -37,13 +37,10 @@ func (wb *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
 
 func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
 	res := controls.NewBottomMenu(wb.ib, wb.window).
-		WithButton(common.ColorBtn).
-		WithButton(common.SaveBtn).
+		WithButtons(common.ColorBtn, common.Toggle).
 		WithButtons(common.IncBtn, common.DecBtn).
-		WithButton(common.Toggle).
-		WithButton(common.ClearBtn).
+		WithButtons(common.SaveBtn, common.ClearBtn).
 		Build()
-
 	wb.left.Add(res)
 	return wb
 }
