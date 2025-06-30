@@ -12,19 +12,14 @@ import (
 	"github.com/pauldin91/sego/src/components/utils"
 )
 
-func (ib *ImageViewer) DragEnd() {}
-func (ib *ImageViewer) Tapped(e *fyne.PointEvent) {
-	ib.update(e.Position)
-}
-func (ib *ImageViewer) Dragged(e *fyne.DragEvent) {
-	ib.update(e.Position)
-}
-
-func (ib *ImageViewer) FocusLost()       {}
-func (ib *ImageViewer) FocusGained()     {}
-func (ib *ImageViewer) TypedRune(r rune) {}
-func (ib *ImageViewer) Focused() bool    { return true }
-func (ib *ImageViewer) TypedKey(event *fyne.KeyEvent) {
+func (ib *ImageBrowser) DragEnd()                  {}
+func (ib *ImageBrowser) Tapped(e *fyne.PointEvent) { ib.update(e.Position) }
+func (ib *ImageBrowser) Dragged(e *fyne.DragEvent) { ib.update(e.Position) }
+func (ib *ImageBrowser) FocusLost()                {}
+func (ib *ImageBrowser) FocusGained()              {}
+func (ib *ImageBrowser) TypedRune(r rune)          {}
+func (ib *ImageBrowser) Focused() bool             { return true }
+func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 
 	switch event.Name {
 	case fyne.KeyLeft:
@@ -44,18 +39,18 @@ func (ib *ImageViewer) TypedKey(event *fyne.KeyEvent) {
 	}
 }
 
-func (ib *ImageViewer) getNext() {
+func (ib *ImageBrowser) getNext() {
 	ib.fb.Next()
 	ib.Clear()
 	ib.Refresh()
 }
 
-func (ib *ImageViewer) getPrevious() {
+func (ib *ImageBrowser) getPrevious() {
 	ib.fb.Previous()
 	ib.Clear()
 	ib.Refresh()
 }
-func (ib *ImageViewer) ChooseColor(c color.Color) {
+func (ib *ImageBrowser) ChooseColor(c color.Color) {
 	r, g, b, _ := c.RGBA()
 	ib.color = color.RGBA{
 		R: uint8(r >> 8),
@@ -67,36 +62,36 @@ func (ib *ImageViewer) ChooseColor(c color.Color) {
 
 }
 
-func (ib *ImageViewer) Clear() {
-	ib.pressed = false
+func (ib *ImageBrowser) Clear() {
 	ib.rgba = common.DefaultBlankImage(ib.BaseWidget.Size())
 	ib.img.Image = ib.rgba
 	ib.img.Refresh()
 }
 
-func (ib *ImageViewer) Save() {
+func (ib *ImageBrowser) Save() {
 	utils.SaveMask(ib.rgba, ib.fb.GetMaskOrDefault())
-	ib.Clear()
 	ib.getNext()
 }
 
-func (ib *ImageViewer) update(e fyne.Position) {
+func (ib *ImageBrowser) update(e fyne.Position) {
 	ib.drawCircle(e)
 	ib.img.Image = ib.rgba
 	ib.img.Refresh()
 }
 
-func (ib *ImageViewer) IncBrush() {
-	ib.brushSize += common.DefaultBrushChange
+func (ib *ImageBrowser) IncBrush() {
+	if ib.brushSize < common.DefaultMaxBrushSize {
+		ib.brushSize += common.DefaultBrushChange
+	}
 }
 
-func (ib *ImageViewer) DecBrush() {
+func (ib *ImageBrowser) DecBrush() {
 	if ib.brushSize >= 2*common.DefaultBrushChange {
 		ib.brushSize -= common.DefaultBrushChange
 	}
 }
 
-func (ib *ImageViewer) Toggle() {
+func (ib *ImageBrowser) Toggle() {
 	temp := ib.color
 	ib.color = ib.transparrentColor
 	ib.transparrentColor = temp
@@ -108,7 +103,7 @@ func (ib *ImageViewer) Toggle() {
 	}
 }
 
-func (ib *ImageViewer) drawCircle(center fyne.Position) {
+func (ib *ImageBrowser) drawCircle(center fyne.Position) {
 	for r := -ib.brushSize; r < ib.brushSize; r += 1.0 {
 		bounds := ib.rgba.Bounds()
 		for th := -math.Pi; th < math.Pi; th += math.Pi / 16 {
@@ -121,33 +116,33 @@ func (ib *ImageViewer) drawCircle(center fyne.Position) {
 	}
 }
 
-func (ib *ImageViewer) OnOpenFolderButtonClicked() {
+func (ib *ImageBrowser) OnOpenFolderButtonClicked() {
 	fd := dialog.NewFolderOpen(func(lu fyne.ListableURI, err error) {
 		if err != nil || lu == nil {
 			return
 		}
-		ib.UpdateImage(lu.Path())
+		ib.updateImage(lu.Path())
 
 	}, ib.parent)
 	ib.setLocation(fd)
 }
 
-func (ib *ImageViewer) OnLoadFileButtonClicked() {
+func (ib *ImageBrowser) OnLoadFileButtonClicked() {
 	fd := dialog.NewFileOpen(func(lu fyne.URIReadCloser, err error) {
 		if err != nil || lu == nil {
 			return
 		}
-		ib.LoadContent(lu.URI().Path())
+		ib.loadContent(lu.URI().Path())
 	}, ib.parent)
 
 	ib.setLocation(fd)
 }
 
-func (ib *ImageViewer) OnClearButtonClicked() {
+func (ib *ImageBrowser) OnClearButtonClicked() {
 	ib.Clear()
 }
 
-func (ib *ImageViewer) setLocation(fd *dialog.FileDialog) {
+func (ib *ImageBrowser) setLocation(fd *dialog.FileDialog) {
 	uri, err := storage.ListerForURI(storage.NewFileURI(ib.fb.GetPath()))
 	if err == nil {
 		fd.SetLocation(uri)

@@ -23,6 +23,7 @@ const (
 	ClearBtn ButtonType = "Clear Mask"
 
 	Toggle   BottomButtonType = "toggle"
+	SaveBtn  BottomButtonType = "S"
 	IncBtn   BottomButtonType = "+"
 	DecBtn   BottomButtonType = "-"
 	ColorBtn BottomButtonType = "O"

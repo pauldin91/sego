@@ -6,6 +6,6 @@ import (
 	"github.com/pauldin91/sego/src/components/viewer"
 )
 
-type ImageBrowser = viewer.ImageViewer
+type ImageBrowser = viewer.ImageBrowser
 type BottomMenu = controls.BottomMenu
 type FileBrowser = browser.FileBrowser

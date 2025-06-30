@@ -12,7 +12,7 @@ import (
 type WindowBuilder struct {
 	widget.BaseWidget
 	window   fyne.Window
-	ib       *browser.ImageViewer
+	ib       *browser.ImageBrowser
 	canvas   *fyne.Container
 	left     *fyne.Container
 	combined *fyne.Container
@@ -37,6 +37,7 @@ func (wb *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
 func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
 	res := controls.NewBottomMenu(wb.ib, wb.window).
 		WithButton(common.ColorBtn).
+		WithButton(common.SaveBtn).
 		WithButton(common.IncBtn).
 		WithButton(common.DecBtn).
 		WithButton(common.Toggle).
@@ -82,8 +83,9 @@ func (wb *WindowBuilder) Build() fyne.Window {
 func (wb *WindowBuilder) WithMainMenu() *WindowBuilder {
 	open := fyne.NewMenuItem("Open Folder", wb.ib.OnOpenFolderButtonClicked)
 	load := fyne.NewMenuItem("Load Image", wb.ib.OnLoadFileButtonClicked)
+	save := fyne.NewMenuItem("Save Mask", wb.ib.Save)
 	clear := fyne.NewMenuItem("Clear Mask", wb.ib.OnClearButtonClicked)
-	menu := fyne.NewMainMenu(fyne.NewMenu("Main Menu", open, load, clear))
+	menu := fyne.NewMainMenu(fyne.NewMenu("Main Menu", open, load, save, clear))
 	wb.window.SetMainMenu(menu)
 
 	return wb

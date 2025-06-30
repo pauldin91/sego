@@ -14,14 +14,14 @@ import (
 
 type BottomMenu struct {
 	buttons      *fyne.Container
-	ib           *viewer.ImageViewer
+	ib           *viewer.ImageBrowser
 	parent       fyne.Window
 	toggleButton *widget.Button
 	btnMapping   map[common.BottomButtonType]func()
 	btnIconMap   map[common.BottomButtonType]fyne.Resource
 }
 
-func NewBottomMenu(ib *viewer.ImageViewer, parent fyne.Window) *BottomMenu {
+func NewBottomMenu(ib *viewer.ImageBrowser, parent fyne.Window) *BottomMenu {
 	res := &BottomMenu{
 		buttons: container.NewHBox(),
 		ib:      ib,
@@ -32,11 +32,13 @@ func NewBottomMenu(ib *viewer.ImageViewer, parent fyne.Window) *BottomMenu {
 		common.DecBtn:   res.onDecreaseBrushButton,
 		common.Toggle:   res.onToggleBrushClicked,
 		common.ColorBtn: res.onColorPickerClicked,
+		common.SaveBtn:  res.ib.Save,
 	}
 	res.btnIconMap = map[common.BottomButtonType]fyne.Resource{
 		common.IncBtn:   theme.ContentAddIcon(),
 		common.DecBtn:   theme.ContentRemoveIcon(),
 		common.ColorBtn: theme.ColorPaletteIcon(),
+		common.SaveBtn:  theme.DocumentSaveIcon(),
 	}
 
 	return res

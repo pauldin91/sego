@@ -16,11 +16,10 @@ import (
 	"github.com/pauldin91/sego/src/components/utils"
 )
 
-type ImageViewer struct {
+type ImageBrowser struct {
 	widget.BaseWidget
 	fb                *browser.FileBrowser
 	currImg           *canvas.Image
-	pressed           bool
 	title             string
 	brushSize         float64
 	img               *canvas.Image
@@ -31,9 +30,9 @@ type ImageViewer struct {
 	parent            fyne.Window
 }
 
-func NewImageBrowser(parent fyne.Window) *ImageViewer {
+func NewImageBrowser(parent fyne.Window) *ImageBrowser {
 
-	ib := &ImageViewer{
+	ib := &ImageBrowser{
 		brushSize:         common.DefaultBrushSize,
 		toggleBrush:       true,
 		color:             common.DefaultPaintColor,
@@ -54,7 +53,7 @@ func NewImageBrowser(parent fyne.Window) *ImageViewer {
 	return ib
 }
 
-func (ib *ImageViewer) Refresh() {
+func (ib *ImageBrowser) Refresh() {
 
 	ib.currImg.File = ib.fb.GetFilename()
 	if ib.currImg.File == "" {
@@ -65,13 +64,13 @@ func (ib *ImageViewer) Refresh() {
 	ib.currImg.Refresh()
 }
 
-func (ib *ImageViewer) UpdateImage(path string) {
+func (ib *ImageBrowser) updateImage(path string) {
 	ib.Clear()
 	ib.fb.UpdatePath(path)
 	ib.Refresh()
 }
 
-func (ib *ImageViewer) Resize(size fyne.Size) {
+func (ib *ImageBrowser) Resize(size fyne.Size) {
 	ib.BaseWidget.Resize(size)
 	ib.currImg.Resize(size)
 	ib.img.Resize(size)
@@ -79,12 +78,12 @@ func (ib *ImageViewer) Resize(size fyne.Size) {
 	ib.img.Image = ib.rgba
 }
 
-func (ib *ImageViewer) LoadContent(selectedImgFile string) {
+func (ib *ImageBrowser) loadContent(selectedImgFile string) {
 	ib.fb.SetIndexForFilename(selectedImgFile)
 	ib.Refresh()
 }
 
-func (ib *ImageViewer) CreateRenderer() fyne.WidgetRenderer {
+func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
 
 	stack := container.NewStack(
 		ib.currImg,
@@ -93,7 +92,7 @@ func (ib *ImageViewer) CreateRenderer() fyne.WidgetRenderer {
 	return widget.NewSimpleRenderer(stack)
 }
 
-func (ib *ImageViewer) loadMask(selectedImgFile string) {
+func (ib *ImageBrowser) loadMask(selectedImgFile string) {
 	mask := ib.fb.GetMask(selectedImgFile)
 	if file, err := os.Open(mask); err == nil {
 		defer file.Close()
@@ -107,5 +106,5 @@ func (ib *ImageViewer) loadMask(selectedImgFile string) {
 	}
 }
 
-func (ib *ImageViewer) GetToggle() bool  { return ib.toggleBrush }
-func (ib *ImageViewer) GetTitle() string { return ib.title }
+func (ib *ImageBrowser) GetToggle() bool  { return ib.toggleBrush }
+func (ib *ImageBrowser) GetTitle() string { return ib.title }
