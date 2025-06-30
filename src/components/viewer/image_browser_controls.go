@@ -7,33 +7,23 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/storage"
 	"github.com/pauldin91/sego/src/common"
 	"github.com/pauldin91/sego/src/components/utils"
 )
 
 func (ib *ImageViewer) DragEnd() {}
-func (ib *ImageViewer) MouseDown(e *desktop.MouseEvent) {
-	ib.pressed = true
+func (ib *ImageViewer) Tapped(e *fyne.PointEvent) {
 	ib.update(e.Position)
-	if canvas := fyne.CurrentApp().Driver().CanvasForObject(ib); canvas != nil {
-		canvas.Focus(ib)
-	}
 }
-func (ib *ImageViewer) MouseUp(e *desktop.MouseEvent) { ib.pressed = false }
-func (ib *ImageViewer) FocusLost()                    {}
-func (ib *ImageViewer) FocusGained()                  {}
-func (ib *ImageViewer) TypedRune(r rune)              {}
-func (ib *ImageViewer) Focused() bool                 { return true }
-
 func (ib *ImageViewer) Dragged(e *fyne.DragEvent) {
-	if !ib.pressed {
-		return
-	}
 	ib.update(e.Position)
 }
 
+func (ib *ImageViewer) FocusLost()       {}
+func (ib *ImageViewer) FocusGained()     {}
+func (ib *ImageViewer) TypedRune(r rune) {}
+func (ib *ImageViewer) Focused() bool    { return true }
 func (ib *ImageViewer) TypedKey(event *fyne.KeyEvent) {
 
 	switch event.Name {
@@ -81,7 +71,7 @@ func (ib *ImageViewer) Clear() {
 	ib.pressed = false
 	ib.rgba = common.DefaultBlankImage(ib.BaseWidget.Size())
 	ib.img.Image = ib.rgba
-	fyne.Do(ib.img.Refresh)
+	ib.img.Refresh()
 }
 
 func (ib *ImageViewer) Save() {
