@@ -93,11 +93,11 @@ func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (ib *ImageBrowser) loadMask(selectedImgFile string) {
+
 	mask := ib.fb.GetMask(selectedImgFile)
 	if file, err := os.Open(mask); err == nil {
 		defer file.Close()
 		if img, err := png.Decode(file); err == nil {
-
 			ib.rgba = utils.ScaleImage(img, ib.Size())
 			ib.img.Image = ib.rgba
 			ib.img.Refresh()

@@ -3,6 +3,7 @@ package components
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/pauldin91/sego/src/common"
 	"github.com/pauldin91/sego/src/components/controls"
@@ -38,9 +39,9 @@ func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
 	res := controls.NewBottomMenu(wb.ib, wb.window).
 		WithButton(common.ColorBtn).
 		WithButton(common.SaveBtn).
-		WithButton(common.IncBtn).
-		WithButton(common.DecBtn).
+		WithButtons(common.IncBtn, common.DecBtn).
 		WithButton(common.Toggle).
+		WithButton(common.ClearBtn).
 		Build()
 
 	wb.left.Add(res)
@@ -52,12 +53,27 @@ func (wb *WindowBuilder) WithDefaultCanvas() *WindowBuilder {
 	return wb
 }
 
+func (wb *WindowBuilder) WithNextBtn() *fyne.Container {
+	next := widget.NewButton("", wb.ib.GetNext)
+	next.Icon = theme.NavigateNextIcon()
+	next.Resize(common.DefaultVButtonSize)
+	return container.NewStack(next)
+}
+
+func (wb *WindowBuilder) WithPrevBtn() *fyne.Container {
+	prev := widget.NewButton("", wb.ib.GetPrevious)
+	prev.Icon = theme.NavigateBackIcon()
+	prev.Resize(common.DefaultVButtonSize)
+	return container.NewStack(prev)
+
+}
+
 func (wb *WindowBuilder) Refresh() {
 	wb.combined = container.NewBorder(
 		nil,
 		container.NewCenter(wb.left),
-		nil,
-		nil,
+		wb.WithPrevBtn(),
+		wb.WithNextBtn(),
 		container.NewStack(wb.ib),
 	)
 
@@ -83,9 +99,7 @@ func (wb *WindowBuilder) Build() fyne.Window {
 func (wb *WindowBuilder) WithMainMenu() *WindowBuilder {
 	open := fyne.NewMenuItem("Open Folder", wb.ib.OnOpenFolderButtonClicked)
 	load := fyne.NewMenuItem("Load Image", wb.ib.OnLoadFileButtonClicked)
-	save := fyne.NewMenuItem("Save Mask", wb.ib.Save)
-	clear := fyne.NewMenuItem("Clear Mask", wb.ib.OnClearButtonClicked)
-	menu := fyne.NewMainMenu(fyne.NewMenu("Main Menu", open, load, save, clear))
+	menu := fyne.NewMainMenu(fyne.NewMenu("Main Menu", open, load))
 	wb.window.SetMainMenu(menu)
 
 	return wb

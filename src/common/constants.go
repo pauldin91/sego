@@ -18,10 +18,10 @@ const (
 	DefaultResourceDir  string  = "../resources"
 )
 const (
-	OpenBtn  ButtonType = "Open Folder"
-	LoadBtn  ButtonType = "Load File"
-	ClearBtn ButtonType = "Clear Mask"
+	OpenBtn ButtonType = "Open Folder"
+	LoadBtn ButtonType = "Load File"
 
+	ClearBtn BottomButtonType = "X"
 	Toggle   BottomButtonType = "toggle"
 	SaveBtn  BottomButtonType = "S"
 	IncBtn   BottomButtonType = "+"
@@ -31,7 +31,9 @@ const (
 
 var DefaultCanvasSize fyne.Size = fyne.NewSize(600, 400)
 var DefaultButtonSize fyne.Size = fyne.NewSize(60, 40)
-var DefaultIconSize fyne.Size = fyne.NewSize(40, 40)
+var DefaultVButtonSize fyne.Size = fyne.NewSize(20, 60)
+var DefaultIconSize fyne.Size = fyne.NewSize(20, 20)
+var DefaultIncBrushSize fyne.Size = fyne.NewSize(10, 10)
 var DefaultPaddingSize fyne.Size = fyne.NewSize(3, 3)
 
 var DefaultPaintColor color.RGBA = color.RGBA{R: 41, G: 111, B: 246, A: 185}

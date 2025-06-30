@@ -33,12 +33,14 @@ func NewBottomMenu(ib *viewer.ImageBrowser, parent fyne.Window) *BottomMenu {
 		common.Toggle:   res.onToggleBrushClicked,
 		common.ColorBtn: res.onColorPickerClicked,
 		common.SaveBtn:  res.ib.Save,
+		common.ClearBtn: res.ib.Clear,
 	}
 	res.btnIconMap = map[common.BottomButtonType]fyne.Resource{
 		common.IncBtn:   theme.ContentAddIcon(),
 		common.DecBtn:   theme.ContentRemoveIcon(),
 		common.ColorBtn: theme.ColorPaletteIcon(),
 		common.SaveBtn:  theme.DocumentSaveIcon(),
+		common.ClearBtn: theme.ContentClearIcon(),
 	}
 
 	return res
@@ -46,6 +48,22 @@ func NewBottomMenu(ib *viewer.ImageBrowser, parent fyne.Window) *BottomMenu {
 
 func (wb *BottomMenu) Build() *fyne.Container {
 	return container.NewCenter(wb.buttons)
+}
+
+func (wb *BottomMenu) WithButtons(btnTypes ...common.BottomButtonType) *BottomMenu {
+	var vBox = container.NewVBox()
+	for _, btnType := range btnTypes {
+		if _, ok := wb.btnMapping[btnType]; !ok {
+			return wb
+		}
+
+		plusButton := widget.NewButton("", wb.btnMapping[btnType])
+		plusButton.Icon = wb.btnIconMap[btnType]
+		plusButton.Resize(common.DefaultIncBrushSize)
+		vBox.Add(plusButton)
+	}
+	wb.buttons.Add(vBox)
+	return wb
 }
 
 func (wb *BottomMenu) WithButton(btnType common.BottomButtonType) *BottomMenu {

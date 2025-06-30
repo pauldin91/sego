@@ -23,9 +23,9 @@ func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 
 	switch event.Name {
 	case fyne.KeyLeft:
-		ib.getPrevious()
+		ib.GetPrevious()
 	case fyne.KeyRight:
-		ib.getNext()
+		ib.GetNext()
 	case fyne.KeyS:
 		ib.Save()
 	case fyne.KeyEqual:
@@ -39,13 +39,13 @@ func (ib *ImageBrowser) TypedKey(event *fyne.KeyEvent) {
 	}
 }
 
-func (ib *ImageBrowser) getNext() {
+func (ib *ImageBrowser) GetNext() {
 	ib.fb.Next()
 	ib.Clear()
 	ib.Refresh()
 }
 
-func (ib *ImageBrowser) getPrevious() {
+func (ib *ImageBrowser) GetPrevious() {
 	ib.fb.Previous()
 	ib.Clear()
 	ib.Refresh()
@@ -70,7 +70,7 @@ func (ib *ImageBrowser) Clear() {
 
 func (ib *ImageBrowser) Save() {
 	utils.SaveMask(ib.rgba, ib.fb.GetMaskOrDefault())
-	ib.getNext()
+	ib.GetNext()
 }
 
 func (ib *ImageBrowser) update(e fyne.Position) {
