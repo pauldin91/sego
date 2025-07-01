@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"math"
 	"os"
+	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
@@ -113,6 +114,12 @@ func (ib *ImageBrowser) drawCircle(center fyne.Position) {
 				ib.rgba.Set(int(x), int(y), ib.color)
 			}
 		}
+	}
+}
+
+func (ib *ImageBrowser) ChangeBrushSize(s string) {
+	if f, err := strconv.ParseFloat(s, 64); err == nil {
+		ib.brushSize = f
 	}
 }
 

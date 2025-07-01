@@ -1,6 +1,7 @@
 package controls
 
 import (
+	"fmt"
 	"image/color"
 
 	"fyne.io/fyne/v2"
@@ -84,6 +85,15 @@ func (wb *BottomMenu) WithButton(btnType common.BottomButtonType) *BottomMenu {
 		wb.buttons.Add(plusButton)
 
 	}
+	return wb
+}
+
+func (wb *BottomMenu) WithFloatWidget(onChanged func(s string)) *BottomMenu {
+
+	entry := widget.NewEntry()
+	entry.SetText(fmt.Sprintf("%.2f", common.DefaultBrushSize))
+	entry.OnChanged = onChanged
+	wb.buttons.Add(entry)
 	return wb
 }
 

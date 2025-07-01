@@ -40,7 +40,9 @@ func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
 		WithButtons(common.ColorBtn, common.Toggle).
 		WithButtons(common.IncBtn, common.DecBtn).
 		WithButtons(common.SaveBtn, common.ClearBtn).
+		WithFloatWidget(wb.ib.ChangeBrushSize).
 		Build()
+
 	wb.left.Add(res)
 	return wb
 }
