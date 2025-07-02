@@ -17,17 +17,24 @@ type WindowBuilder struct {
 	canvas   *fyne.Container
 	left     *fyne.Container
 	combined *fyne.Container
+	cfg      common.Config
 }
 
 func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
+
+	cfg, err := common.LoadConfig("env.json")
+	if err != nil {
+		panic(err)
+	}
 
 	result := &WindowBuilder{
 		window:   a.NewWindow(title),
 		canvas:   container.NewHBox(),
 		left:     container.NewHBox(),
 		combined: container.NewVBox(),
+		cfg:      *cfg,
 	}
-	result.ib = browser.NewImageBrowser(result.window)
+	result.ib = browser.NewImageBrowser(*cfg, result.window)
 	result.ExtendBaseWidget(result)
 	return result
 }
@@ -36,7 +43,7 @@ func (wb *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
-	res := controls.NewBottomMenu(wb.ib, wb.window).
+	res := controls.NewBottomMenu(wb.cfg, wb.ib, wb.window).
 		WithButtons(common.ColorBtn, common.Toggle).
 		WithButtons(common.IncBtn, common.DecBtn).
 		WithButtons(common.SaveBtn, common.ClearBtn).

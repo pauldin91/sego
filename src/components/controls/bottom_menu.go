@@ -20,13 +20,15 @@ type BottomMenu struct {
 	toggleButton *widget.Button
 	btnMapping   map[common.BottomButtonType]func()
 	btnIconMap   map[common.BottomButtonType]fyne.Resource
+	cfg          common.Config
 }
 
-func NewBottomMenu(ib *viewer.ImageBrowser, parent fyne.Window) *BottomMenu {
+func NewBottomMenu(cfg common.Config, ib *viewer.ImageBrowser, parent fyne.Window) *BottomMenu {
 	res := &BottomMenu{
 		buttons: container.NewHBox(),
 		ib:      ib,
 		parent:  parent,
+		cfg:     cfg,
 	}
 	res.btnMapping = map[common.BottomButtonType]func(){
 		common.IncBtn:   res.onIncreaseBrushButton,
@@ -91,7 +93,7 @@ func (wb *BottomMenu) WithButton(btnType common.BottomButtonType) *BottomMenu {
 func (wb *BottomMenu) WithFloatWidget(onChanged func(s string)) *BottomMenu {
 
 	entry := widget.NewEntry()
-	entry.SetText(fmt.Sprintf("%.2f", common.DefaultBrushSize))
+	entry.SetText(fmt.Sprintf("%.2f", wb.cfg.DefaultBrushSize))
 	entry.OnChanged = onChanged
 	wb.buttons.Add(entry)
 	return wb

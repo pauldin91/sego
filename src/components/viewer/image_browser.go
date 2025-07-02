@@ -28,15 +28,17 @@ type ImageBrowser struct {
 	color             color.RGBA
 	transparrentColor color.RGBA
 	parent            fyne.Window
+	cfg               common.Config
 }
 
-func NewImageBrowser(parent fyne.Window) *ImageBrowser {
+func NewImageBrowser(cfg common.Config, parent fyne.Window) *ImageBrowser {
 
 	ib := &ImageBrowser{
-		brushSize:         common.DefaultBrushSize,
+		brushSize:         cfg.DefaultBrushSize,
 		toggleBrush:       true,
 		color:             common.DefaultPaintColor,
-		fb:                browser.NewFileBrowser(),
+		fb:                browser.NewFileBrowser(cfg),
+		cfg:               cfg,
 		transparrentColor: common.DefaultTransparrentColor,
 		parent:            parent,
 	}

@@ -13,22 +13,24 @@ type FileBrowser struct {
 	path  string
 	index int
 	files []string
+	cfg   common.Config
 }
 
-func NewFileBrowser() *FileBrowser {
+func NewFileBrowser(cfg common.Config) *FileBrowser {
 	initPath, _ := os.Getwd()
-	initPath = path.Join(initPath, common.DefaultResourceDir)
+	initPath = path.Join(initPath, cfg.DefaultResourceDir)
 	res := &FileBrowser{
 		path:  initPath,
 		index: 0,
 		files: make([]string, 0),
+		cfg:   cfg,
 	}
 	return res
 }
 
 func (fb *FileBrowser) GetMask(selectedImgFile string) string {
-	name := common.DefaultMaskPreffix + filepath.Base(selectedImgFile)
-	return path.Join(fb.path, common.DefaultMaskDir, name)
+	name := fb.cfg.DefaultMaskPreffix + filepath.Base(selectedImgFile)
+	return path.Join(fb.path, fb.cfg.DefaultMaskDir, name)
 }
 
 func (fb *FileBrowser) UpdatePath(path string) {
@@ -73,14 +75,14 @@ func (ib *FileBrowser) Previous() {
 }
 
 func (ib *FileBrowser) GetMaskOrDefault() string {
-	var dir string = path.Join(ib.path, common.DefaultMaskDir)
+	var dir string = path.Join(ib.path, ib.cfg.DefaultMaskDir)
 	err := os.MkdirAll(dir, 0755)
 	var filename string
 
 	if err != nil || (ib.index >= len(ib.files) || ib.index < 0) {
 		filename = path.Join(dir, "empty_"+uuid.New().String()+".png")
 	} else {
-		filename = path.Join(dir, common.DefaultMaskPreffix+filepath.Base(ib.files[ib.index]))
+		filename = path.Join(dir, ib.cfg.DefaultMaskPreffix+filepath.Base(ib.files[ib.index]))
 	}
 
 	return filename

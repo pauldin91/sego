@@ -81,14 +81,14 @@ func (ib *ImageBrowser) update(e fyne.Position) {
 }
 
 func (ib *ImageBrowser) IncBrush() {
-	if ib.brushSize < common.DefaultMaxBrushSize {
-		ib.brushSize += common.DefaultBrushChange
+	if ib.brushSize < ib.cfg.DefaultMaxBrushSize {
+		ib.brushSize += ib.cfg.DefaultBrushChange
 	}
 }
 
 func (ib *ImageBrowser) DecBrush() {
-	if ib.brushSize >= 2*common.DefaultBrushChange {
-		ib.brushSize -= common.DefaultBrushChange
+	if ib.brushSize >= 2*ib.cfg.DefaultBrushChange {
+		ib.brushSize -= ib.cfg.DefaultBrushChange
 	}
 }
 

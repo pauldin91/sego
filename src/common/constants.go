@@ -10,14 +10,6 @@ type ButtonType string
 type BottomButtonType string
 
 const (
-	DefaultBrushSize    float64 = 15.0
-	DefaultMaxBrushSize float64 = 50.0
-	DefaultBrushChange  float64 = 1.0
-	DefaultMaskPreffix  string  = "mask_"
-	DefaultMaskDir      string  = "masks"
-	DefaultResourceDir  string  = "../resources"
-)
-const (
 	OpenBtn ButtonType = "Open Folder"
 	LoadBtn ButtonType = "Load File"
 
