@@ -1,7 +1,7 @@
 # SeGo 
 A lightweight and intuitive image segmentation annotation tool built with [Fyne](https://fyne.io/) in Go.
 
-SegGo lets you annotate images, export label masks, and manage datasets for machine learning workflows — all in a clean, cross-platform GUI.
+SeGo lets you annotate images, export label masks, and manage datasets for machine learning workflows — all in a clean, cross-platform GUI.
 
 ## Features
 
