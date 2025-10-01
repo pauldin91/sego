@@ -1,4 +1,4 @@
-# SegGo 
+# SeGo 
 A lightweight and intuitive image segmentation annotation tool built with [Fyne](https://fyne.io/) in Go.
 
 SegGo lets you annotate images, export label masks, and manage datasets for machine learning workflows — all in a clean, cross-platform GUI.
@@ -13,7 +13,7 @@ SegGo lets you annotate images, export label masks, and manage datasets for mach
 
 ## Dependencies
 
-SegGo is written in Go and uses the [Fyne](https://github.com/fyne-io/fyne) UI toolkit.
+SeGo is written in pure Go and uses the [Fyne](https://github.com/fyne-io/fyne) UI toolkit.
 
 ### Prerequisites
 
@@ -25,7 +25,7 @@ SegGo is written in Go and uses the [Fyne](https://github.com/fyne-io/fyne) UI t
 Clone the repository and build the application:
 
 ```
-git clone https://github.com/pauldin91/seggo.git
-cd seggo
+git clone https://github.com/pauldin91/sego.git
+cd sego
 go mod tidy
 go run main.go
