@@ -1,4 +1,4 @@
-package browser
+package components
 
 import (
 	"os"
@@ -6,17 +6,17 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
-	"github.com/pauldin91/sego/src/common"
+	"github.com/pauldin91/sego/utils"
 )
 
 type FileBrowser struct {
 	path  string
 	index int
 	files []string
-	cfg   common.Config
+	cfg   utils.Config
 }
 
-func NewFileBrowser(cfg common.Config) *FileBrowser {
+func NewFileBrowser(cfg utils.Config) *FileBrowser {
 	initPath, _ := os.Getwd()
 	initPath = path.Join(initPath, cfg.DefaultResourceDir)
 	res := &FileBrowser{
@@ -36,7 +36,7 @@ func (fb *FileBrowser) GetMask(selectedImgFile string) string {
 func (fb *FileBrowser) UpdatePath(path string) {
 	fb.path = path
 	fb.index = 0
-	fb.files = common.ListDir(fb.path)
+	fb.files = utils.ListDir(fb.path)
 }
 
 func (fb *FileBrowser) GetPath() string { return fb.path }
@@ -51,7 +51,7 @@ func (fb *FileBrowser) GetFilename() string {
 func (fb *FileBrowser) SetIndexForFilename(selectedImgFile string) {
 	fb.path = filepath.Dir(selectedImgFile)
 	fb.index = 0
-	fb.files = common.ListDir(fb.path)
+	fb.files = utils.ListDir(fb.path)
 	for i, f := range fb.files {
 		if f == selectedImgFile {
 			fb.index = i

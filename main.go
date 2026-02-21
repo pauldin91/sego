@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2/app"
-	"github.com/pauldin91/sego/src/components"
+	"github.com/pauldin91/sego/components"
 )
 
 func main() {

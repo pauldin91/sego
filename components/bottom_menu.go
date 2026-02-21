@@ -1,4 +1,4 @@
-package controls
+package components
 
 import (
 	"fmt"
@@ -9,41 +9,40 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/pauldin91/sego/src/common"
-	"github.com/pauldin91/sego/src/components/viewer"
+	"github.com/pauldin91/sego/utils"
 )
 
 type BottomMenu struct {
 	buttons      *fyne.Container
-	ib           *viewer.ImageBrowser
+	ib           *ImageBrowser
 	parent       fyne.Window
 	toggleButton *widget.Button
-	btnMapping   map[common.BottomButtonType]func()
-	btnIconMap   map[common.BottomButtonType]fyne.Resource
-	cfg          common.Config
+	btnMapping   map[utils.BottomButtonType]func()
+	btnIconMap   map[utils.BottomButtonType]fyne.Resource
+	cfg          utils.Config
 }
 
-func NewBottomMenu(cfg common.Config, ib *viewer.ImageBrowser, parent fyne.Window) *BottomMenu {
+func NewBottomMenu(cfg utils.Config, ib *ImageBrowser, parent fyne.Window) *BottomMenu {
 	res := &BottomMenu{
 		buttons: container.NewHBox(),
 		ib:      ib,
 		parent:  parent,
 		cfg:     cfg,
 	}
-	res.btnMapping = map[common.BottomButtonType]func(){
-		common.IncBtn:   res.onIncreaseBrushButton,
-		common.DecBtn:   res.onDecreaseBrushButton,
-		common.Toggle:   res.onToggleBrushClicked,
-		common.ColorBtn: res.onColorPickerClicked,
-		common.SaveBtn:  res.ib.Save,
-		common.ClearBtn: res.ib.Clear,
+	res.btnMapping = map[utils.BottomButtonType]func(){
+		utils.IncBtn:   res.onIncreaseBrushButton,
+		utils.DecBtn:   res.onDecreaseBrushButton,
+		utils.Toggle:   res.onToggleBrushClicked,
+		utils.ColorBtn: res.onColorPickerClicked,
+		utils.SaveBtn:  res.ib.Save,
+		utils.ClearBtn: res.ib.Clear,
 	}
-	res.btnIconMap = map[common.BottomButtonType]fyne.Resource{
-		common.IncBtn:   theme.ContentAddIcon(),
-		common.DecBtn:   theme.ContentRemoveIcon(),
-		common.ColorBtn: theme.ColorPaletteIcon(),
-		common.SaveBtn:  theme.DocumentSaveIcon(),
-		common.ClearBtn: theme.ContentClearIcon(),
+	res.btnIconMap = map[utils.BottomButtonType]fyne.Resource{
+		utils.IncBtn:   theme.ContentAddIcon(),
+		utils.DecBtn:   theme.ContentRemoveIcon(),
+		utils.ColorBtn: theme.ColorPaletteIcon(),
+		utils.SaveBtn:  theme.DocumentSaveIcon(),
+		utils.ClearBtn: theme.ContentClearIcon(),
 	}
 
 	return res
@@ -53,13 +52,13 @@ func (wb *BottomMenu) Build() *fyne.Container {
 	return container.NewCenter(wb.buttons)
 }
 
-func (wb *BottomMenu) WithButtons(btnTypes ...common.BottomButtonType) *BottomMenu {
+func (wb *BottomMenu) WithButtons(btnTypes ...utils.BottomButtonType) *BottomMenu {
 	var vBox = container.NewVBox()
 	for _, btnType := range btnTypes {
 		if _, ok := wb.btnMapping[btnType]; !ok {
 			return wb
 		}
-		if btnType == common.Toggle {
+		if btnType == utils.Toggle {
 			wb.toggleButton = widget.NewButton("", wb.onToggleBrushClicked)
 			wb.setToggleIcon()
 			vBox.Add(wb.toggleButton)
@@ -69,21 +68,21 @@ func (wb *BottomMenu) WithButtons(btnTypes ...common.BottomButtonType) *BottomMe
 			vBox.Add(plusButton)
 		}
 	}
-	vBox.Resize(common.DefaultIconSize)
+	vBox.Resize(utils.DefaultIconSize)
 	wb.buttons.Add(vBox)
 	return wb
 }
 
-func (wb *BottomMenu) WithButton(btnType common.BottomButtonType) *BottomMenu {
+func (wb *BottomMenu) WithButton(btnType utils.BottomButtonType) *BottomMenu {
 	if _, ok := wb.btnMapping[btnType]; !ok {
 		return wb
 	}
-	if btnType == common.Toggle {
+	if btnType == utils.Toggle {
 		wb.withToggleBrushBtn()
 	} else {
 		plusButton := widget.NewButton("", wb.btnMapping[btnType])
 		plusButton.Icon = wb.btnIconMap[btnType]
-		plusButton.Resize(common.DefaultIconSize)
+		plusButton.Resize(utils.DefaultIconSize)
 		wb.buttons.Add(plusButton)
 
 	}

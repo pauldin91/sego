@@ -1,9 +1,10 @@
-package common
+package utils
 
 import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/png"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,6 +22,28 @@ func DefaultBlankImage(size fyne.Size) *image.RGBA {
 func isImage(file string) bool {
 	ext := strings.ToLower(filepath.Ext(file))
 	return imageExts[ext]
+}
+
+func ScaleImage(img image.Image, dstSize fyne.Size) *image.RGBA {
+	width := int(dstSize.Width)
+	height := int(dstSize.Height)
+
+	scaled := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.CatmullRom.Scale(scaled, scaled.Bounds(), img, img.Bounds(), draw.Over, nil)
+
+	return scaled
+}
+
+func SaveMask(rgba *image.RGBA, filename string) {
+
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Printf("error saving the image %s : %v\n", filename, err)
+		return
+	}
+	defer file.Close()
+
+	png.Encode(file, rgba)
 }
 
 func ListDir(dir string) []string {

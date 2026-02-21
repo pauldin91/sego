@@ -5,24 +5,22 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/pauldin91/sego/src/common"
-	"github.com/pauldin91/sego/src/components/controls"
-	browser "github.com/pauldin91/sego/src/components/viewer"
+	"github.com/pauldin91/sego/utils"
 )
 
 type WindowBuilder struct {
 	widget.BaseWidget
 	window   fyne.Window
-	ib       *browser.ImageBrowser
+	ib       *ImageBrowser
 	canvas   *fyne.Container
 	left     *fyne.Container
 	combined *fyne.Container
-	cfg      common.Config
+	cfg      utils.Config
 }
 
 func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
 
-	cfg, err := common.LoadConfig("env.json")
+	cfg, err := utils.LoadConfig("env.json")
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +32,7 @@ func NewWindowBuilder(title string, a fyne.App) *WindowBuilder {
 		combined: container.NewVBox(),
 		cfg:      *cfg,
 	}
-	result.ib = browser.NewImageBrowser(*cfg, result.window)
+	result.ib = NewImageBrowser(*cfg, result.window)
 	result.ExtendBaseWidget(result)
 	return result
 }
@@ -43,10 +41,10 @@ func (wb *WindowBuilder) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (wb *WindowBuilder) WithBottomMenu() *WindowBuilder {
-	res := controls.NewBottomMenu(wb.cfg, wb.ib, wb.window).
-		WithButtons(common.ColorBtn, common.Toggle).
-		WithButtons(common.IncBtn, common.DecBtn).
-		WithButtons(common.SaveBtn, common.ClearBtn).
+	res := NewBottomMenu(wb.cfg, wb.ib, wb.window).
+		WithButtons(utils.ColorBtn, utils.Toggle).
+		WithButtons(utils.IncBtn, utils.DecBtn).
+		WithButtons(utils.SaveBtn, utils.ClearBtn).
 		WithFloatWidget(wb.ib.ChangeBrushSize).
 		Build()
 
@@ -62,14 +60,14 @@ func (wb *WindowBuilder) WithDefaultCanvas() *WindowBuilder {
 func (wb *WindowBuilder) WithNextBtn() *fyne.Container {
 	next := widget.NewButton("", wb.ib.GetNext)
 	next.Icon = theme.NavigateNextIcon()
-	next.Resize(common.DefaultVButtonSize)
+	next.Resize(utils.DefaultVButtonSize)
 	return container.NewStack(next)
 }
 
 func (wb *WindowBuilder) WithPrevBtn() *fyne.Container {
 	prev := widget.NewButton("", wb.ib.GetPrevious)
 	prev.Icon = theme.NavigateBackIcon()
-	prev.Resize(common.DefaultVButtonSize)
+	prev.Resize(utils.DefaultVButtonSize)
 	return container.NewStack(prev)
 
 }
@@ -92,8 +90,8 @@ func (wb *WindowBuilder) Refresh() {
 
 func (wb *WindowBuilder) calcWindowSize() fyne.Size {
 
-	var width = wb.window.Canvas().Size().Width + common.DefaultIconSize.Width + common.DefaultPaddingSize.Width
-	var height = wb.window.Canvas().Size().Height + common.DefaultButtonSize.Height + common.DefaultPaddingSize.Height
+	var width = wb.window.Canvas().Size().Width + utils.DefaultIconSize.Width + utils.DefaultPaddingSize.Width
+	var height = wb.window.Canvas().Size().Height + utils.DefaultButtonSize.Height + utils.DefaultPaddingSize.Height
 	return fyne.NewSize(width, height)
 }
 

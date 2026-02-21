@@ -1,18 +1,114 @@
-package viewer
+package components
 
 import (
+	"image"
 	"image/color"
+	"image/png"
 	"math"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
-	"github.com/pauldin91/sego/src/common"
-	"github.com/pauldin91/sego/src/components/utils"
+	"fyne.io/fyne/v2/widget"
+	"github.com/pauldin91/sego/utils"
 )
 
+type ImageBrowser struct {
+	widget.BaseWidget
+	fb                *FileBrowser
+	currImg           *canvas.Image
+	title             string
+	brushSize         float64
+	img               *canvas.Image
+	rgba              *image.RGBA
+	toggleBrush       bool
+	color             color.RGBA
+	transparrentColor color.RGBA
+	parent            fyne.Window
+	cfg               utils.Config
+}
+
+func NewImageBrowser(cfg utils.Config, parent fyne.Window) *ImageBrowser {
+
+	ib := &ImageBrowser{
+		brushSize:         cfg.DefaultBrushSize,
+		toggleBrush:       true,
+		color:             utils.DefaultPaintColor,
+		fb:                NewFileBrowser(cfg),
+		cfg:               cfg,
+		transparrentColor: utils.DefaultTransparrentColor,
+		parent:            parent,
+	}
+	ib.rgba = utils.DefaultBlankImage(utils.DefaultCanvasSize)
+	ib.currImg = canvas.NewImageFromImage(ib.rgba)
+	ib.img = canvas.NewImageFromImage(ib.rgba)
+	ib.currImg.FillMode = canvas.ImageFillContain
+	ib.img.FillMode = canvas.ImageFillContain
+	ib.title = "Canvas"
+	ib.ExtendBaseWidget(ib)
+	return ib
+}
+
+func (ib *ImageBrowser) Refresh() {
+
+	ib.currImg.File = ib.fb.GetFilename()
+	if ib.currImg.File == "" {
+		return
+	}
+	ib.title = filepath.Base(ib.currImg.File)
+	ib.loadMask(ib.currImg.File)
+	ib.currImg.Refresh()
+}
+
+func (ib *ImageBrowser) updateImage(path string) {
+	ib.Clear()
+	ib.fb.UpdatePath(path)
+	ib.Refresh()
+}
+
+func (ib *ImageBrowser) Resize(size fyne.Size) {
+	ib.BaseWidget.Resize(size)
+	ib.currImg.Resize(size)
+	ib.img.Resize(size)
+	ib.rgba = utils.ScaleImage(ib.rgba, fyne.NewSize(size.Width, size.Height))
+	ib.img.Image = ib.rgba
+}
+
+func (ib *ImageBrowser) loadContent(selectedImgFile string) {
+	ib.fb.SetIndexForFilename(selectedImgFile)
+	ib.Refresh()
+}
+
+func (ib *ImageBrowser) CreateRenderer() fyne.WidgetRenderer {
+
+	stack := container.NewStack(
+		ib.currImg,
+		ib.img,
+	)
+	return widget.NewSimpleRenderer(stack)
+}
+
+func (ib *ImageBrowser) loadMask(selectedImgFile string) {
+
+	mask := ib.fb.GetMask(selectedImgFile)
+	if file, err := os.Open(mask); err == nil {
+		defer file.Close()
+		if img, err := png.Decode(file); err == nil {
+			ib.rgba = utils.ScaleImage(img, ib.Size())
+			ib.img.Image = ib.rgba
+			ib.img.Refresh()
+		}
+
+	}
+}
+
+func (ib *ImageBrowser) GetToggle() bool           { return ib.toggleBrush }
+func (ib *ImageBrowser) GetTitle() string          { return ib.title }
 func (ib *ImageBrowser) DragEnd()                  {}
 func (ib *ImageBrowser) Tapped(e *fyne.PointEvent) { ib.update(e.Position) }
 func (ib *ImageBrowser) Dragged(e *fyne.DragEvent) { ib.update(e.Position) }
@@ -58,13 +154,13 @@ func (ib *ImageBrowser) ChooseColor(c color.Color) {
 		G: uint8(g >> 8),
 		B: uint8(b >> 8),
 		A: 127}
-	ib.transparrentColor = common.DefaultTransparrentColor
+	ib.transparrentColor = utils.DefaultTransparrentColor
 	ib.toggleBrush = true
 
 }
 
 func (ib *ImageBrowser) Clear() {
-	ib.rgba = common.DefaultBlankImage(ib.BaseWidget.Size())
+	ib.rgba = utils.DefaultBlankImage(ib.BaseWidget.Size())
 	ib.img.Image = ib.rgba
 	ib.img.Refresh()
 }
