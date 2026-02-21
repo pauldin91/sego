@@ -14,7 +14,7 @@ import (
 
 type BottomMenu struct {
 	buttons      *fyne.Container
-	ib           *ImageBrowser
+	ib           *ImageViewer
 	parent       fyne.Window
 	toggleButton *widget.Button
 	btnMapping   map[utils.BottomButtonType]func()
@@ -22,7 +22,7 @@ type BottomMenu struct {
 	cfg          utils.Config
 }
 
-func NewBottomMenu(cfg utils.Config, ib *ImageBrowser, parent fyne.Window) *BottomMenu {
+func NewBottomMenu(cfg utils.Config, ib *ImageViewer, parent fyne.Window) *BottomMenu {
 	res := &BottomMenu{
 		buttons: container.NewHBox(),
 		ib:      ib,

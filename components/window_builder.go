@@ -11,7 +11,7 @@ import (
 type WindowBuilder struct {
 	widget.BaseWidget
 	window   fyne.Window
-	ib       *ImageBrowser
+	ib       *ImageViewer
 	canvas   *fyne.Container
 	left     *fyne.Container
 	combined *fyne.Container
